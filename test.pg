@@ -1,4 +1,4 @@
-if 1 then 2  else
+if(1){ 2 }  else { 3 }
 
 x4321
  

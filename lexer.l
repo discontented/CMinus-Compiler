@@ -15,12 +15,12 @@ digit  [0-9]
 letter [a-zA-Z]
 number {digit}+
 identifier     {letter}({letter}|{digit})*
-string_literal L?\"(\\.|[^\\"])*\"
+string_literal \"(\\.|[^\\"])*\"
 
 %%
 
 {ws}     ;
-if      { return IF; }
+"if"      { return IF; }
 "("     { return LPAR; }
 ")"     { return RPAR; }
 "{"     { return LCURL; }

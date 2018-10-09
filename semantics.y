@@ -11,15 +11,14 @@ void yyerror(char const *);
 %token SEMI COMMA LPAR RPAR LCURL RCURL
 %token INT STRING FLOAT CHAR BOOL VOID
 %token RETURN
-%token ID NUM STRING
+%token ID NUM
 %left '-' '+'
 %left '*' '/'
 
 %%
 
 program:
-    function
-    | program function
+    block { root = $$; }
     ;
 
 function:
@@ -27,17 +26,17 @@ function:
     | function_declaration block
     ;
 
+parameter_list:
+    expression
+    | parameter_list COMMA expression
+    ;
+
 function_declaration:
-    type ID LPAR paramater_list RPAR
+    type ID LPAR parameter_list RPAR
     ;
 
 function_call:
-    ID LPAR paramater_list RPAR
-    ;
-
-paramater_list:
-    parameter
-    | parameter paramater_list
+    ID LPAR parameter_list RPAR
     ;
 
 block:
@@ -45,16 +44,17 @@ block:
     ;
 
 statement_list:
-    statement
-    | statement statement_list
+    statement SEMI
+    | statement SEMI statement_list
     ;
 
 statement:
-    expression SEMI
+    expression
+    | var_declaration
+    | function
     | if_statement
     | while_statement
-    | var_declaration SEMI
-    | assign_statement SEMI
+    | return_statement
     | %empty
     ;
 
@@ -62,53 +62,113 @@ var_declaration:
     type declarator_list
     ;
 
-declarator_list:
-    declarator
-    | declarator declarator_list
+type:
+    primitive_type
     ;
 
+primitive_type:
+    numeric_type
+    | boolean_type
+    | string_type
+    ;
+
+numeric_type:
+    INT NUM
+    | FLOAT NUM
+    ;
+
+declarator_list:
+    declarator
+    | declarator COMMA declarator_list
+    ;
+
+declarator:
+    ID
+    | assign_expr
+    ;    
+
 if_statement:
-    IF LPAR expression RPAR block
+    IF LPAR expression RPAR block  {$$ = ifElseStatement($3, $5)}
     ;
 
 while_statement:
     WHILE LPAR expression RPAR block
     ;
 
+return_statement:
+    RETURN expression
+    | RETURN
+    ;
+
 expression:
     arithmetic_expr
     | boolean_expr
-    | string_expr
     | function_call
+    | assign_expr
+    ;
+
+assign_expr:
+    lhs '=' expression
+    ;
+
+lhs:
+    ID
+    ;
+
+addop:
+    '+' 
+    | '-'
+    ;
+
+relop:
+    "<"
+    | "<="
+    | "=="
+    | ">="
+    | ">"
+    ;
+
+multop:
+    '*'
+    | '/'
+    | '%'
     ;
 
 arithmetic_expr:
-    expression '+' multiplicative_expr
-    | expression '-' multiplicative_expr
+    arithmetic_expr addop multiplicative_expr
     | multiplicative_expr
     ;
 
 multiplicative_expr:
-    multiplicative_expr '*' root_expr   {$$ = $1 * $2}
-    | multiplicative_expr '/' root_expr {$$ = $1 / $2}
-    | root_expr                         {$$ = $1}
+    multiplicative_expr multop factor
+    | factor                      
     ;
 
-root_expr:
-    LPAR expression RPAR    {$$ = $1}
-    | NUM                   {$$ = $1}
+factor:
+    LPAR arithmetic_expr RPAR
+    | variable
+    | '-'factor
+    | NUM
     ;
 
 boolean_expr:
-    boolean_expr '||' mul_bexpr
+    boolean_expr "||" mul_bexpr
     | mul_bexpr
     ;
 
 mul_bexpr:
-    mul_bexpr '&&' root_bexpr
-    | expression '>=' expression
-    | expression '<=' expression
-    | expression '==' expression
+    mul_bexpr "&&" root_bexpr
+    | root_bexpr
+    ;
+
+root_bexpr:
+    '!'root_bexpr
+    | arithmetic_expr relop arithmetic_expr
+    ;
+
+variable:
+    ID
+    ;
 
 %%
 

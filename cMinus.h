@@ -20,6 +20,7 @@ class binaryOp_node : public exp_node {
 public:
     exp_node *left;
     exp_node *right;
+    
 
   // the constructor for node links the node to its children,
   // and stores the character representation of the operator.

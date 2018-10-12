@@ -1,0 +1,382 @@
+Terminals unused in grammar
+
+   IF
+   WHILE
+   COMMA
+   INT
+   STRING
+   FLOAT
+   CHAR
+   BOOL
+   VOID
+   RETURN
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: block
+
+    2 block: LCURL statement_list RCURL
+
+    3 statement_list: statement SEMI
+    4               | statement SEMI statement_list
+
+    5 statement: expression
+    6          | %empty
+
+    7 expression: arithmetic_expr
+
+    8 arithmetic_expr: arithmetic_expr '+' multiplicative_expr
+    9                | arithmetic_expr '-' multiplicative_expr
+   10                | multiplicative_expr
+
+   11 multiplicative_expr: multiplicative_expr '*' factor
+   12                    | multiplicative_expr '/' factor
+   13                    | factor
+
+   14 factor: LPAR arithmetic_expr RPAR
+   15       | '-' factor
+   16       | NUMBER
+   17       | ID
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'*' (42) 11
+'+' (43) 8
+'-' (45) 9 15
+'/' (47) 12
+error (256)
+IF (258)
+WHILE (259)
+SEMI (260) 3 4
+COMMA (261)
+LPAR (262) 14
+RPAR (263) 14
+LCURL (264) 2
+RCURL (265) 2
+INT (266)
+STRING (267)
+FLOAT (268)
+CHAR (269)
+BOOL (270)
+VOID (271)
+RETURN (272)
+NUMBER (273) 16
+ID (274) 17
+
+
+Nonterminals, with rules where they appear
+
+$accept (24)
+    on left: 0
+program (25)
+    on left: 1, on right: 0
+block (26)
+    on left: 2, on right: 1
+statement_list (27)
+    on left: 3 4, on right: 2 4
+statement (28)
+    on left: 5 6, on right: 3 4
+expression (29)
+    on left: 7, on right: 5
+arithmetic_expr (30)
+    on left: 8 9 10, on right: 7 8 9 14
+multiplicative_expr (31)
+    on left: 11 12 13, on right: 8 9 10 11 12
+factor (32)
+    on left: 14 15 16 17, on right: 11 12 13 15
+
+
+State 0
+
+    0 $accept: . program $end
+
+    LCURL  shift, and go to state 1
+
+    program  go to state 2
+    block    go to state 3
+
+
+State 1
+
+    2 block: LCURL . statement_list RCURL
+
+    LPAR    shift, and go to state 4
+    NUMBER  shift, and go to state 5
+    ID      shift, and go to state 6
+    '-'     shift, and go to state 7
+
+    $default  reduce using rule 6 (statement)
+
+    statement_list       go to state 8
+    statement            go to state 9
+    expression           go to state 10
+    arithmetic_expr      go to state 11
+    multiplicative_expr  go to state 12
+    factor               go to state 13
+
+
+State 2
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 14
+
+
+State 3
+
+    1 program: block .
+
+    $default  reduce using rule 1 (program)
+
+
+State 4
+
+   14 factor: LPAR . arithmetic_expr RPAR
+
+    LPAR    shift, and go to state 4
+    NUMBER  shift, and go to state 5
+    ID      shift, and go to state 6
+    '-'     shift, and go to state 7
+
+    arithmetic_expr      go to state 15
+    multiplicative_expr  go to state 12
+    factor               go to state 13
+
+
+State 5
+
+   16 factor: NUMBER .
+
+    $default  reduce using rule 16 (factor)
+
+
+State 6
+
+   17 factor: ID .
+
+    $default  reduce using rule 17 (factor)
+
+
+State 7
+
+   15 factor: '-' . factor
+
+    LPAR    shift, and go to state 4
+    NUMBER  shift, and go to state 5
+    ID      shift, and go to state 6
+    '-'     shift, and go to state 7
+
+    factor  go to state 16
+
+
+State 8
+
+    2 block: LCURL statement_list . RCURL
+
+    RCURL  shift, and go to state 17
+
+
+State 9
+
+    3 statement_list: statement . SEMI
+    4               | statement . SEMI statement_list
+
+    SEMI  shift, and go to state 18
+
+
+State 10
+
+    5 statement: expression .
+
+    $default  reduce using rule 5 (statement)
+
+
+State 11
+
+    7 expression: arithmetic_expr .
+    8 arithmetic_expr: arithmetic_expr . '+' multiplicative_expr
+    9                | arithmetic_expr . '-' multiplicative_expr
+
+    '+'  shift, and go to state 19
+    '-'  shift, and go to state 20
+
+    $default  reduce using rule 7 (expression)
+
+
+State 12
+
+   10 arithmetic_expr: multiplicative_expr .
+   11 multiplicative_expr: multiplicative_expr . '*' factor
+   12                    | multiplicative_expr . '/' factor
+
+    '*'  shift, and go to state 21
+    '/'  shift, and go to state 22
+
+    $default  reduce using rule 10 (arithmetic_expr)
+
+
+State 13
+
+   13 multiplicative_expr: factor .
+
+    $default  reduce using rule 13 (multiplicative_expr)
+
+
+State 14
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 15
+
+    8 arithmetic_expr: arithmetic_expr . '+' multiplicative_expr
+    9                | arithmetic_expr . '-' multiplicative_expr
+   14 factor: LPAR arithmetic_expr . RPAR
+
+    RPAR  shift, and go to state 23
+    '+'   shift, and go to state 19
+    '-'   shift, and go to state 20
+
+
+State 16
+
+   15 factor: '-' factor .
+
+    $default  reduce using rule 15 (factor)
+
+
+State 17
+
+    2 block: LCURL statement_list RCURL .
+
+    $default  reduce using rule 2 (block)
+
+
+State 18
+
+    3 statement_list: statement SEMI .
+    4               | statement SEMI . statement_list
+
+    LPAR    shift, and go to state 4
+    NUMBER  shift, and go to state 5
+    ID      shift, and go to state 6
+    '-'     shift, and go to state 7
+
+    SEMI      reduce using rule 6 (statement)
+    $default  reduce using rule 3 (statement_list)
+
+    statement_list       go to state 24
+    statement            go to state 9
+    expression           go to state 10
+    arithmetic_expr      go to state 11
+    multiplicative_expr  go to state 12
+    factor               go to state 13
+
+
+State 19
+
+    8 arithmetic_expr: arithmetic_expr '+' . multiplicative_expr
+
+    LPAR    shift, and go to state 4
+    NUMBER  shift, and go to state 5
+    ID      shift, and go to state 6
+    '-'     shift, and go to state 7
+
+    multiplicative_expr  go to state 25
+    factor               go to state 13
+
+
+State 20
+
+    9 arithmetic_expr: arithmetic_expr '-' . multiplicative_expr
+
+    LPAR    shift, and go to state 4
+    NUMBER  shift, and go to state 5
+    ID      shift, and go to state 6
+    '-'     shift, and go to state 7
+
+    multiplicative_expr  go to state 26
+    factor               go to state 13
+
+
+State 21
+
+   11 multiplicative_expr: multiplicative_expr '*' . factor
+
+    LPAR    shift, and go to state 4
+    NUMBER  shift, and go to state 5
+    ID      shift, and go to state 6
+    '-'     shift, and go to state 7
+
+    factor  go to state 27
+
+
+State 22
+
+   12 multiplicative_expr: multiplicative_expr '/' . factor
+
+    LPAR    shift, and go to state 4
+    NUMBER  shift, and go to state 5
+    ID      shift, and go to state 6
+    '-'     shift, and go to state 7
+
+    factor  go to state 28
+
+
+State 23
+
+   14 factor: LPAR arithmetic_expr RPAR .
+
+    $default  reduce using rule 14 (factor)
+
+
+State 24
+
+    4 statement_list: statement SEMI statement_list .
+
+    $default  reduce using rule 4 (statement_list)
+
+
+State 25
+
+    8 arithmetic_expr: arithmetic_expr '+' multiplicative_expr .
+   11 multiplicative_expr: multiplicative_expr . '*' factor
+   12                    | multiplicative_expr . '/' factor
+
+    '*'  shift, and go to state 21
+    '/'  shift, and go to state 22
+
+    $default  reduce using rule 8 (arithmetic_expr)
+
+
+State 26
+
+    9 arithmetic_expr: arithmetic_expr '-' multiplicative_expr .
+   11 multiplicative_expr: multiplicative_expr . '*' factor
+   12                    | multiplicative_expr . '/' factor
+
+    '*'  shift, and go to state 21
+    '/'  shift, and go to state 22
+
+    $default  reduce using rule 9 (arithmetic_expr)
+
+
+State 27
+
+   11 multiplicative_expr: multiplicative_expr '*' factor .
+
+    $default  reduce using rule 11 (multiplicative_expr)
+
+
+State 28
+
+   12 multiplicative_expr: multiplicative_expr '/' factor .
+
+    $default  reduce using rule 12 (multiplicative_expr)

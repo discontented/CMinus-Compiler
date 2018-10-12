@@ -48,9 +48,6 @@ void yyerror(const char* s);
 %type <exp_node_ptr> expression
 %type <exp_node_ptr> multiplicative_expr
 %type <exp_node_ptr> arithmetic_expr
-%type <exp_node_ptr> boolean_expr
-%type <exp_node_ptr> assign_expr
-%type <exp_node_ptr> function_call
 %type <exp_node_ptr> factor
 %type <stmt_node_ptr> statement_list
 %type <stmt_node_ptr> statement
@@ -59,112 +56,25 @@ void yyerror(const char* s);
 %%
 
 program:
-    block { root = $$; }
+    statement_list { root = $$; }
     ;
-
-function:
-    function_declaration
-    | function_declaration block
-    ;
-
-parameter_list:
-    expression
-    | parameter_list COMMA expression
-    ;
-
-function_declaration:
-    type ID LPAR parameter_list RPAR
-    ;
-
-function_call:
-    ID LPAR parameter_list RPAR {;}
-    ;
-
+/*
 block:
     LCURL statement_list RCURL
     ;
-
+*/
 statement_list:
     statement SEMI { $$ = $1; }
-    | statement SEMI statement_list { $$ new sequence_node($3, $1);}
+    | statement SEMI statement_list { $$ = new sequence_node($3, $1);}
     ;
 
 statement:
     expression { $$ = $1;}
-    | var_declaration { $$ = $1;}
-    | function { $$ = $1;}
-    | if_statement { $$ = $1;}
-    | while_statement { $$ = $1;}
-    | return_statement { $$ = $1;}
     | { $$ = new skip_node(); }
-    ;
-
-var_declaration:
-    type declarator_list {}
-    ;
-
-type:
-    primitive_type { $$ = $1; }
-    ;
-
-primitive_type:
-    numeric_type { $$ = $1; }
-    ;
-
-numeric_type:
-    INT NUMBER { $$ = $2; }
-    | FLOAT NUMBER { $$ = $2; }
-    ;
-
-declarator_list:
-    declarator
-    | declarator COMMA declarator_list
-    ;
-
-declarator:
-    ID
-    | assign_expr
-    ;    
-
-if_statement:
-    //IF LPAR expression RPAR block  {$$ = new ifElseStatement($3, $5)}
-    ;
-
-while_statement:
-    //WHILE LPAR expression RPAR block {$$ = new whileStatement($3, $5)}
-    ;
-
-return_statement:
-    //RETURN expression {$$ = returnStatement($2);}
-    | RETURN
     ;
 
 expression:
     arithmetic_expr {$$ = $1;}
-    | boolean_expr {$$ = $1;}
-    | function_call {$$ = $1;}
-    | assign_expr {$$ = $1;}
-    ;
-
-assign_expr:
-    lhs '=' expression {$$ = new assign_node($1, $3);}
-    ;
-
-lhs:
-    ID { $$ = $1 }
-    ;
-
-relop:
-    "<"
-    | "<="
-    | "=="
-    | ">="
-    | ">"
-    ;
-
-multop:
-    '*'
-    | '/'
     ;
 
 arithmetic_expr:
@@ -176,7 +86,7 @@ arithmetic_expr:
 multiplicative_expr:
     multiplicative_expr '*' factor { $$ = new multiply_node( $1, $3); }
     | multiplicative_expr '/' factor { $$ = new divide_node( $1, $3); }
-    | factor   { $$ = $1}                    
+    | factor   { $$ = $1; }                    
     ;
 
 factor:
@@ -184,21 +94,6 @@ factor:
     | '-'factor  {$$ = new neg_node($2); }
     | NUMBER {$$ = new number_node($1); }
     | ID  {$$ = new variable_node($1); }
-    ;
-
-boolean_expr:
-    boolean_expr "||" mul_bexpr
-    | mul_bexpr
-    ;
-
-mul_bexpr:
-    mul_bexpr "&&" root_bexpr
-    | root_bexpr
-    ;
-
-root_bexpr:
-    '!'root_bexpr
-    | arithmetic_expr relop arithmetic_expr
     ;
 
 %%
@@ -217,6 +112,7 @@ int main(int argc, char **argv)
   
 
   root->evaluate();
+  
 }
 
 

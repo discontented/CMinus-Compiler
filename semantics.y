@@ -146,9 +146,9 @@ multiplicative_expr:
 
 factor:
     LPAR arithmetic_expr RPAR
-    | variable
     | '-'factor
     | NUM
+    | ID
     ;
 
 boolean_expr:
@@ -164,10 +164,6 @@ mul_bexpr:
 root_bexpr:
     '!'root_bexpr
     | arithmetic_expr relop arithmetic_expr
-    ;
-
-variable:
-    ID
     ;
 
 %%

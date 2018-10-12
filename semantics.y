@@ -92,11 +92,11 @@ if_statement:
     ;
 
 while_statement:
-    WHILE LPAR expression RPAR block
+    WHILE LPAR expression RPAR block {$$ = whileStatement($3, $5)}
     ;
 
 return_statement:
-    RETURN expression
+    RETURN expression {$$ = returnStatement($2)}
     | RETURN
     ;
 

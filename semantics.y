@@ -47,6 +47,10 @@ void yyerror(const char* s);
 %token <var_name> ID
 %type <exp_node_ptr> expression
 %type <exp_node_ptr> multiplicative_expr
+%type <exp_node_ptr> arithmetic_expr
+%type <exp_node_ptr> boolean_expr
+%type <exp_node_ptr> assignment_expr
+%type <exp_node_ptr> fuction_call
 %type <exp_node_ptr> factor
 %type <stmt_node_ptr> statement_list
 %type <stmt_node_ptr> statement
@@ -92,7 +96,7 @@ statement:
     | if_statement
     | while_statement
     | return_statement
-    | %empty
+    | %empty {;}
     ;
 
 var_declaration:
@@ -105,13 +109,11 @@ type:
 
 primitive_type:
     numeric_type
-    | boolean_type
-    | string_type
     ;
 
 numeric_type:
-    INT NUM
-    | FLOAT NUM
+    INT NUMBER
+    | FLOAT NUMBER
     ;
 
 declarator_list:
@@ -125,15 +127,15 @@ declarator:
     ;    
 
 if_statement:
-    IF LPAR expression RPAR block  {$$ = ifElseStatement($3, $5)}
+    //IF LPAR expression RPAR block  {$$ = new ifElseStatement($3, $5)}
     ;
 
 while_statement:
-    WHILE LPAR expression RPAR block {$$ = whileStatement($3, $5)}
+    //WHILE LPAR expression RPAR block {$$ = new whileStatement($3, $5)}
     ;
 
 return_statement:
-    RETURN expression {$$ = returnStatement($2);}
+    //RETURN expression {$$ = returnStatement($2);}
     | RETURN
     ;
 
@@ -185,7 +187,7 @@ multiplicative_expr:
 factor:
     LPAR arithmetic_expr RPAR {$$ = $2; }
     | '-'factor  {$$ = new neg_node($2); }
-    | NUM {$$ = new number_node($1); }
+    | NUMBER {$$ = new number_node($1); }
     | ID  {$$ = new variable_node($1); }
     ;
 

@@ -110,10 +110,7 @@ void yyerror(const char* s);
 # define YYERROR_VERBOSE 0
 #endif
 
-/* In a future release of Bison, this section will be replaced
-   by #include "expressions.tab.h".  */
-#ifndef YY_YY_EXPRESSIONS_TAB_H_INCLUDED
-# define YY_YY_EXPRESSIONS_TAB_H_INCLUDED
+
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -159,7 +156,7 @@ union YYSTYPE
   exp_node *exp_node_ptr;
   stmt_node *stmt_node_ptr;
 
-#line 163 "expressions.tab.c" /* yacc.c:355  */
+#line 160 "expressions.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -172,11 +169,11 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_EXPRESSIONS_TAB_H_INCLUDED  */
+
 
 /* Copy the second part of user declarations.  */
 
-#line 180 "expressions.tab.c" /* yacc.c:358  */
+#line 177 "expressions.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -1261,101 +1258,101 @@ yyreduce:
         case 2:
 #line 58 "expressions.y" /* yacc.c:1646  */
     { root = (yyval.stmt_node_ptr); }
-#line 1265 "expressions.tab.c" /* yacc.c:1646  */
+#line 1262 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
 #line 66 "expressions.y" /* yacc.c:1646  */
     { (yyval.stmt_node_ptr) = (yyvsp[-1].stmt_node_ptr); }
-#line 1271 "expressions.tab.c" /* yacc.c:1646  */
+#line 1268 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
 #line 67 "expressions.y" /* yacc.c:1646  */
     { (yyval.stmt_node_ptr) = new sequence_node((yyvsp[0].stmt_node_ptr), (yyvsp[-2].stmt_node_ptr));}
-#line 1277 "expressions.tab.c" /* yacc.c:1646  */
+#line 1274 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
 #line 71 "expressions.y" /* yacc.c:1646  */
     { (yyval.stmt_node_ptr) = (stmt_node*)(yyvsp[0].exp_node_ptr);}
-#line 1283 "expressions.tab.c" /* yacc.c:1646  */
+#line 1280 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
 #line 72 "expressions.y" /* yacc.c:1646  */
     { (yyval.stmt_node_ptr) = new skip_node(); }
-#line 1289 "expressions.tab.c" /* yacc.c:1646  */
+#line 1286 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
 #line 76 "expressions.y" /* yacc.c:1646  */
     {(yyval.exp_node_ptr) = (yyvsp[0].exp_node_ptr);}
-#line 1295 "expressions.tab.c" /* yacc.c:1646  */
+#line 1292 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
 #line 80 "expressions.y" /* yacc.c:1646  */
     { (yyval.exp_node_ptr) = new add_node((yyvsp[-2].exp_node_ptr), (yyvsp[0].exp_node_ptr)); }
-#line 1301 "expressions.tab.c" /* yacc.c:1646  */
+#line 1298 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
 #line 81 "expressions.y" /* yacc.c:1646  */
     { (yyval.exp_node_ptr) = new subtract_node((yyvsp[-2].exp_node_ptr), (yyvsp[0].exp_node_ptr)); }
-#line 1307 "expressions.tab.c" /* yacc.c:1646  */
+#line 1304 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
 #line 82 "expressions.y" /* yacc.c:1646  */
     { (yyval.exp_node_ptr) = (yyvsp[0].exp_node_ptr); }
-#line 1313 "expressions.tab.c" /* yacc.c:1646  */
+#line 1310 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
 #line 86 "expressions.y" /* yacc.c:1646  */
     { (yyval.exp_node_ptr) = new multiply_node( (yyvsp[-2].exp_node_ptr), (yyvsp[0].exp_node_ptr)); }
-#line 1319 "expressions.tab.c" /* yacc.c:1646  */
+#line 1316 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
 #line 87 "expressions.y" /* yacc.c:1646  */
     { (yyval.exp_node_ptr) = new divide_node( (yyvsp[-2].exp_node_ptr), (yyvsp[0].exp_node_ptr)); }
-#line 1325 "expressions.tab.c" /* yacc.c:1646  */
+#line 1322 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
 #line 88 "expressions.y" /* yacc.c:1646  */
     { (yyval.exp_node_ptr) = (yyvsp[0].exp_node_ptr); }
-#line 1331 "expressions.tab.c" /* yacc.c:1646  */
+#line 1328 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
 #line 92 "expressions.y" /* yacc.c:1646  */
     {(yyval.exp_node_ptr) = (yyvsp[-1].exp_node_ptr); }
-#line 1337 "expressions.tab.c" /* yacc.c:1646  */
+#line 1334 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
 #line 93 "expressions.y" /* yacc.c:1646  */
     {(yyval.exp_node_ptr) = new neg_node((yyvsp[0].exp_node_ptr)); }
-#line 1343 "expressions.tab.c" /* yacc.c:1646  */
+#line 1340 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
 #line 94 "expressions.y" /* yacc.c:1646  */
     {(yyval.exp_node_ptr) = new number_node((yyvsp[0].number)); }
-#line 1349 "expressions.tab.c" /* yacc.c:1646  */
+#line 1346 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
 #line 95 "expressions.y" /* yacc.c:1646  */
     {(yyval.exp_node_ptr) = new variable_node((yyvsp[0].var_name)); }
-#line 1355 "expressions.tab.c" /* yacc.c:1646  */
+#line 1352 "expressions.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1359 "expressions.tab.c" /* yacc.c:1646  */
+#line 1356 "expressions.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires

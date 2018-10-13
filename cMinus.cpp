@@ -1,3 +1,5 @@
+#include "cMinus.h"
+
 #include <iostream>
 #include <stdlib.h>
 #include <string>

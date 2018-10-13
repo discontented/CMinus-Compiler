@@ -70,7 +70,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 34 "expressions.y" /* yacc.c:1909  */
+#line 33 "expressions.y" /* yacc.c:1909  */
 
   float number;
   char * var_name;

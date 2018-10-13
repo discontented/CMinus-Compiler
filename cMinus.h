@@ -46,11 +46,7 @@ class neg_node : public exp_node {
   float evaluate();
 };
 
-class stmt_node {
- public:
-  virtual void print() {}
-  virtual void evaluate() = 0;
-};
+typedef exp_node stmt_node;
 
 class variable_node : public exp_node {
 protected:
@@ -109,13 +105,13 @@ class assign_node : public stmt_node {
  public:
   assign_node(string name, exp_node *expression);
   void print();
-  void evaluate();
+  float evaluate();
 };
 class skip_node: public stmt_node {
  public:
   skip_node();
   void print();
-  void evaluate();
+  float evaluate();
 };
 
 
@@ -125,7 +121,7 @@ class sequence_node: public stmt_node {
  public:
   sequence_node(stmt_node *mystmt1, stmt_node *mystmt2);
   void print();
-  void evaluate();
+  float evaluate();
 };
 
 // the object at the base of our tree

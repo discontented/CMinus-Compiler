@@ -13,7 +13,6 @@ void yyerror(char const *);
 #include <list>
 #include "cMinus.h"
 
-
 using namespace std;
 
  extern FILE *yyin;
@@ -69,7 +68,7 @@ statement_list:
     ;
 
 statement:
-    expression { $$ = $1;}
+    expression { $$ = (stmt_node*)$1;}
     | { $$ = new skip_node(); }
     ;
 

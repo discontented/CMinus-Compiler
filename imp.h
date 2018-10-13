@@ -20,7 +20,6 @@ class binaryOp_node : public exp_node {
 public:
     exp_node *left;
     exp_node *right;
-    
 
   // the constructor for node links the node to its children,
   // and stores the character representation of the operator.
@@ -45,8 +44,6 @@ class neg_node : public exp_node {
   void print();
   float evaluate();
 };
-
-typedef exp_node stmt_node;
 
 class variable_node : public exp_node {
 protected:
@@ -98,6 +95,12 @@ class divide_node : public binaryOp_node {
   float evaluate();
 };
 
+class stmt_node {
+ public:
+  virtual void print() {}
+  virtual void evaluate() = 0;
+};
+
 class assign_node : public stmt_node {
  protected:
   string id;
@@ -105,13 +108,23 @@ class assign_node : public stmt_node {
  public:
   assign_node(string name, exp_node *expression);
   void print();
-  float evaluate();
+  void evaluate();
 };
+
+class print_node: public stmt_node {
+ protected:
+  exp_node *exp;
+ public:
+  print_node(exp_node *myexp);
+  void print();
+  void evaluate();
+};
+
 class skip_node: public stmt_node {
  public:
   skip_node();
   void print();
-  float evaluate();
+  void evaluate();
 };
 
 
@@ -121,8 +134,9 @@ class sequence_node: public stmt_node {
  public:
   sequence_node(stmt_node *mystmt1, stmt_node *mystmt2);
   void print();
-  float evaluate();
+  void evaluate();
 };
 
 // the object at the base of our tree
 extern map<string, float> state;
+

@@ -19,7 +19,7 @@ using namespace std;
  extern FILE *yyin;
 
 // the root of the abstract syntax tree
- stmt_node *root;
+ statement *root;
 
 // for keeping track of line numbers in the program we are parsing
   int line_num = 1;
@@ -32,36 +32,47 @@ void yyerror(const char* s);
 %start program
 
 %union {
-  float number;
-  char * var_name;
+  float num;
+  char *id;
+  operation oper;
   exp_node *exp_node_ptr;
-  stmt_node *stmt_node_ptr;
+  cond_node *cond_node_ptr;
+  statement *st;
 }
 
 /* Bison Declarations */
-%token IF WHILE
+%token IF WHILE ELSE
 %token SEMI COMMA LPAR RPAR LCURL RCURL
 %token INT STRING FLOAT CHAR BOOL VOID
 %token RETURN
-%token <number> NUMBER
+%token AND OR NOT
+%token <num> NUMBER
 %token <var_name> ID
+%token <oper> RELOP
 %type <exp_node_ptr> expression
 %type <exp_node_ptr> multiplicative_expr
 %type <exp_node_ptr> arithmetic_expr
-%type <exp_node_ptr> boolean_expr
 %type <exp_node_ptr> assign_expr
-%type <exp_node_ptr> function_call
+// %type <exp_node_ptr> function_call
 %type <exp_node_ptr> factor
-%type <stmt_node_ptr> statement_list
-%type <stmt_node_ptr> statement
-%type <stmt_node_ptr> program
+%type <st> statement_list
+%type <st> statement
+%type <st> program
+%type <st> declarator
+// %type <st> declarator_list
+%type <st> while_statement
+%type <st> if_statement
+// %type <st> return_statement
+%type <cond_node_ptr> boolean_expr
+%type <cond_node_ptr> mul_bexpr
+%type <cond_node_ptr> root_bexpr
 
 %%
 
 program:
-    block { root = $$; }
+    statement_list { root = $$; }
     ;
-
+/*
 function:
     function_declaration
     | function_declaration block
@@ -79,28 +90,26 @@ function_declaration:
 function_call:
     ID LPAR parameter_list RPAR {;}
     ;
-
-block:
-    LCURL statement_list RCURL
-    ;
+*/
 
 statement_list:
-    statement SEMI { $$ = $1; }
-    | statement SEMI statement_list { $$ new sequence_node($3, $1);}
+    statement_list SEMI statement { $$ = new sequence_node($1, $3); }
+    | statement_list SEMI error { $$ = $1; yyclearin; }
+    | statement { $$ = $1; }
     ;
 
 statement:
     expression { $$ = $1;}
-    | var_declaration { $$ = $1;}
-    | function { $$ = $1;}
+    | declarator { $$ = $1;}
     | if_statement { $$ = $1;}
     | while_statement { $$ = $1;}
-    | return_statement { $$ = $1;}
-    | { $$ = new skip_node(); }
+    // | return_statement { $$ = $1;}
+    | LCURL statement RCURL { $$ = $2; }
+    | { $$ = new skip_stmt(); }
     ;
-
+/*
 var_declaration:
-    type declarator_list {}
+    type declarator_list { $$ = $2 }
     ;
 
 type:
@@ -120,85 +129,67 @@ declarator_list:
     declarator
     | declarator COMMA declarator_list
     ;
-
+*/
 declarator:
-    ID
-    | assign_expr
+    ID { $$ = $1; }
+    | assign_expr { $$ = $1; }
     ;    
 
 if_statement:
-    //IF LPAR expression RPAR block  {$$ = new ifElseStatement($3, $5)}
+    IF LPAR expression RPAR statement ELSE statement { $$ = new ife_stmt(new test($3), $5, $7); }
     ;
 
 while_statement:
-    //WHILE LPAR expression RPAR block {$$ = new whileStatement($3, $5)}
+    WHILE LPAR expression RPAR statement { $$ = new while_stmt(new test($3), $5); }
     ;
-
+/*
 return_statement:
     //RETURN expression {$$ = returnStatement($2);}
     | RETURN
     ;
-
+*/
 expression:
     arithmetic_expr {$$ = $1;}
     | boolean_expr {$$ = $1;}
-    | function_call {$$ = $1;}
     | assign_expr {$$ = $1;}
     ;
 
 assign_expr:
-    lhs '=' expression {$$ = new assign_node($1, $3);}
-    ;
-
-lhs:
-    ID { $$ = $1 }
-    ;
-
-relop:
-    "<"
-    | "<="
-    | "=="
-    | ">="
-    | ">"
-    ;
-
-multop:
-    '*'
-    | '/'
+    ID '=' expression {$$ = new assignment_stmt($1, $3);}
     ;
 
 arithmetic_expr:
-    arithmetic_expr '+' multiplicative_expr { $$ = new add_node($1, $3); }
-    | arithmetic_expr '-' multiplicative_expr { $$ = new subtract_node($1, $3); }
+    arithmetic_expr '+' multiplicative_expr { $$ = new plus_node($1, $3); }
+    | arithmetic_expr '-' multiplicative_expr { $$ = new minus_node($1, $3); }
     | multiplicative_expr { $$ = $1; }
     ;
 
 multiplicative_expr:
-    multiplicative_expr '*' factor { $$ = new multiply_node( $1, $3); }
+    multiplicative_expr '*' factor { $$ = new times_node( $1, $3); }
     | multiplicative_expr '/' factor { $$ = new divide_node( $1, $3); }
-    | factor   { $$ = $1}                    
+    | factor   { $$ = $1 }                    
     ;
 
 factor:
     LPAR arithmetic_expr RPAR {$$ = $2; }
-    | '-'factor  {$$ = new neg_node($2); }
+    | '-'factor  {$$ = new unary_minus_node($2); }
     | NUMBER {$$ = new number_node($1); }
-    | ID  {$$ = new variable_node($1); }
+    | ID  {$$ = new id_node($1); }
     ;
 
 boolean_expr:
-    boolean_expr "||" mul_bexpr
-    | mul_bexpr
+    boolean_expr OR mul_bexpr { $$ = new or_cond_node($1, $3); }
+    | mul_bexpr { $$ = $1; }
     ;
 
 mul_bexpr:
-    mul_bexpr "&&" root_bexpr
-    | root_bexpr
+    mul_bexpr AND root_bexpr { $$ = new and_cond_node($1, $3); }
+    | root_bexpr { $$ = $1; }
     ;
 
 root_bexpr:
-    '!'root_bexpr
-    | arithmetic_expr relop arithmetic_expr
+    '!'root_bexpr { $$ = new neg_cond_node($2); }
+    | arithmetic_expr RELOP arithmetic_expr { $$ = new prim_cond_node($2, $1, $3); }
     ;
 
 %%
@@ -211,7 +202,9 @@ int main(int argc, char **argv)
 
   cout << "---------- list of input program------------" << endl << endl;
 
-  root -> print();
+  root -> labelling(1);
+
+  root -> print(0); cout<< endl;
 
   cout << "---------- exeuction of input program------------" << endl << endl;
   
@@ -219,4 +212,8 @@ int main(int argc, char **argv)
   root->evaluate();
 }
 
+void yyerror(char * s)
+{
+  fprintf(stderr, "line %d: %s\n", line_num, s);
+}
 

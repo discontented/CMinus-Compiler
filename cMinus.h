@@ -6,9 +6,15 @@
 
 using namespace std;
 
-class exp_node {
-  public:
+enum operation
+{
+    EQ,
+    GE
+};
 
+class exp_node
+{
+  public:
     // print function for pretty printing an expression
     virtual void print() = 0;
 
@@ -16,113 +22,270 @@ class exp_node {
     virtual float evaluate() = 0;
 };
 
-class binaryOp_node : public exp_node {
-public:
+class operator_node : public exp_node
+{
+  public:
     exp_node *left;
     exp_node *right;
-    
 
-  // the constructor for node links the node to its children,
-  // and stores the character representation of the operator.
-    binaryOp_node(exp_node *L, exp_node *R);
+    // the constructor for node links the node to its children,
+    // and stores the character representation of the operator.
+    operator_node(exp_node *L, exp_node *R);
 };
 
-class number_node : public exp_node {
- private:
+class number_node : public exp_node
+{
+  private:
     float num;
 
- public:
-  number_node(float value);
-  void print();
-  float evaluate();
-};
-
-class neg_node : public exp_node {
- protected:
-  exp_node *exp;
- public:
-  neg_node(exp_node *exp);
-  void print();
-  float evaluate();
-};
-
-typedef exp_node stmt_node;
-
-class variable_node : public exp_node {
-protected:
-  string id;
-
-public:
-  variable_node(string value);
-  void print();
-  float evaluate();
-};
-
-// add_node inherits the characteristics of node and adds its own evaluate function
-class add_node : public binaryOp_node {
   public:
-
-  // add_node's constructor just uses node's constructor
-  add_node(exp_node *L, exp_node *R);
-  void print();
-  float evaluate();
+    number_node(float value);
+    void print();
+    float evaluate();
 };
 
+class unary_minus_node : public exp_node
+{
+  protected:
+    exp_node *exp;
 
-// subtract_node inherits the characteristics of node and adds its own evaluate function
-class subtract_node : public binaryOp_node {
   public:
-
-  subtract_node(exp_node *L, exp_node *R);
-  void print();
-  float evaluate();
+    unary_minus_node(exp_node *exp);
+    void print();
+    float evaluate();
 };
 
+class id_node : public exp_node
+{
+  protected:
+    string id;
 
-// multiply_node inherits the characteristics of node and adds its own evaluate function
-class multiply_node : public binaryOp_node {
   public:
-
-  multiply_node(exp_node *L, exp_node *R);
-  void print();
-  float evaluate();
+    id_node(string value);
+    void print();
+    float evaluate();
 };
 
+// plus_node inherits the characteristics of node and adds its own evaluate function
+class plus_node : public operator_node
+{
+  public:
+    // plus_node's constructor just uses node's constructor
+    plus_node(exp_node *L, exp_node *R);
+    void print();
+    float evaluate();
+};
+
+// minus_node inherits the characteristics of node and adds its own evaluate function
+class minus_node : public operator_node
+{
+  public:
+    minus_node(exp_node *L, exp_node *R);
+    void print();
+    float evaluate();
+};
+
+// times_node inherits the characteristics of node and adds its own evaluate function
+class times_node : public operator_node
+{
+  public:
+    times_node(exp_node *L, exp_node *R);
+    void print();
+    float evaluate();
+};
 
 // divide_node inherits the characteristics of node and adds its own evaluate function
-class divide_node : public binaryOp_node {
+class divide_node : public operator_node
+{
   public:
-
-  divide_node(exp_node *L, exp_node *R);
-  void print();
-  float evaluate();
+    divide_node(exp_node *L, exp_node *R);
+    void print();
+    float evaluate();
 };
 
-class assign_node : public stmt_node {
- protected:
-  string id;
-  exp_node *exp;
- public:
-  assign_node(string name, exp_node *expression);
-  void print();
-  float evaluate();
-};
-class skip_node: public stmt_node {
- public:
-  skip_node();
-  void print();
-  float evaluate();
+class cond_node
+{
+  public:
+    // print function for pretty printing an expression
+    virtual void print() = 0;
+
+    // evaluation function for a leaf, replaced for interior nodes
+    virtual bool evaluate() = 0;
 };
 
+class or_cond_node : public cond_node
+{
+  private:
+    cond_node *left, *right;
 
-class sequence_node: public stmt_node {
- protected:
-  stmt_node *stmt1, *stmt2;
- public:
-  sequence_node(stmt_node *mystmt1, stmt_node *mystmt2);
-  void print();
-  float evaluate();
+  public:
+    or_cond_node(cond_node *L, cond_node *R);
+    void print();
+    bool evaluate();
 };
 
-// the object at the base of our tree
-extern map<string, float> state;
+class and_cond_node : public cond_node
+{
+  private:
+    cond_node *left, *right;
+
+  public:
+    and_cond_node(cond_node *L, cond_node *R);
+    void print();
+    bool evaluate();
+};
+
+class neg_cond_node : public cond_node
+{
+  private:
+    cond_node *child;
+
+  public:
+    neg_cond_node(cond_node *child);
+    void print();
+    bool evaluate();
+};
+
+class prim_cond_node : public cond_node
+{
+  private:
+    operation op;
+    exp_node *left, *right;
+
+  public:
+    prim_cond_node(operation op, exp_node *L, exp_node *R);
+    void print();
+    bool evaluate();
+};
+
+typedef int TLABEL;
+
+class basic_block
+{
+  protected:
+    TLABEL mylabel;
+};
+
+class test : public basic_block
+{
+  private:
+    cond_node *condition;
+
+  public:
+    test(cond_node *condition);
+    void print();
+    bool evaluate();
+    TLABEL labelling(TLABEL next)
+    {
+        mylabel = next;
+        return next + 1;
+    }
+};
+
+class statement
+{
+  public:
+    virtual void print(int) {}
+    virtual void evaluate() = 0;
+    virtual TLABEL labelling(TLABEL next) = 0;
+};
+
+class ife_stmt : public statement
+{
+  protected:
+    test *condition;
+    statement *thenbranch, *elsebranch;
+
+  public:
+    ife_stmt(test *condition, statement *thenbranch, statement *elsebranch);
+    void print(int);
+    void evaluate();
+    TLABEL labelling(TLABEL);
+};
+
+class while_stmt : public statement
+{
+  protected:
+    test *condition;
+    statement *bodystmt;
+
+  public:
+    while_stmt(test *condition, statement *bodystmt);
+    void print(int);
+    void evaluate();
+    TLABEL labelling(TLABEL);
+};
+
+class input_stmt : public statement, basic_block
+{
+  protected:
+    string id;
+
+  public:
+    input_stmt(string name);
+    void print(int);
+    void evaluate();
+    TLABEL labelling(TLABEL next)
+    {
+        mylabel = next;
+        return next + 1;
+    }
+};
+
+class assignment_stmt : public statement, public basic_block
+{
+  protected:
+    string id;
+    exp_node *exp;
+
+  public:
+    assignment_stmt(string name, exp_node *expression);
+    void print(int);
+    void evaluate();
+    TLABEL labelling(TLABEL next)
+    {
+        mylabel = next;
+        return next + 1;
+    }
+};
+
+class print_stmt : public statement, public basic_block
+{
+  protected:
+    exp_node *exp;
+
+  public:
+    print_stmt(exp_node *myexp);
+    void print(int);
+    void evaluate();
+    TLABEL labelling(TLABEL next)
+    {
+        mylabel = next;
+        return next + 1;
+    }
+};
+
+class skip_stmt : public statement, public basic_block
+{
+  public:
+    skip_stmt();
+    void print(int);
+    void evaluate();
+    TLABEL labelling(TLABEL next)
+    {
+        mylabel = next;
+        return next + 1;
+    }
+};
+
+class sequence_stmt : public statement
+{
+  protected:
+    statement *stmt1, *stmt2;
+
+  public:
+    sequence_stmt(statement *mystmt1, statement *mystmt2);
+    void print(int);
+    void evaluate();
+    TLABEL labelling(TLABEL);
+};

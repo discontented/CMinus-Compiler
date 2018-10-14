@@ -47,7 +47,7 @@ void yyerror(const char* s);
 %token RETURN
 %token AND OR NOT
 %token <num> NUMBER
-%token <var_name> ID
+%token <id> ID
 %token <oper> RELOP
 %type <exp_node_ptr> expression
 %type <exp_node_ptr> multiplicative_expr
@@ -58,7 +58,7 @@ void yyerror(const char* s);
 %type <st> statement_list
 %type <st> statement
 %type <st> program
-%type <st> declarator
+// %type <st> declarator
 // %type <st> declarator_list
 %type <st> while_statement
 %type <st> if_statement
@@ -100,7 +100,6 @@ statement_list:
 
 statement:
     expression { $$ = $1;}
-    | declarator { $$ = $1;}
     | if_statement { $$ = $1;}
     | while_statement { $$ = $1;}
     // | return_statement { $$ = $1;}
@@ -129,12 +128,12 @@ declarator_list:
     declarator
     | declarator COMMA declarator_list
     ;
-*/
+
 declarator:
     ID { $$ = $1; }
     | assign_expr { $$ = $1; }
     ;    
-
+*/
 if_statement:
     IF LPAR expression RPAR statement ELSE statement { $$ = new ife_stmt(new test($3), $5, $7); }
     ;
@@ -142,12 +141,14 @@ if_statement:
 while_statement:
     WHILE LPAR expression RPAR statement { $$ = new while_stmt(new test($3), $5); }
     ;
+
 /*
 return_statement:
     //RETURN expression {$$ = returnStatement($2);}
     | RETURN
     ;
 */
+
 expression:
     arithmetic_expr {$$ = $1;}
     | boolean_expr {$$ = $1;}
@@ -167,7 +168,7 @@ arithmetic_expr:
 multiplicative_expr:
     multiplicative_expr '*' factor { $$ = new times_node( $1, $3); }
     | multiplicative_expr '/' factor { $$ = new divide_node( $1, $3); }
-    | factor   { $$ = $1 }                    
+    | factor { $$ = $1; }                    
     ;
 
 factor:

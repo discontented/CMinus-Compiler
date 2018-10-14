@@ -13,7 +13,7 @@
     extern int line_num;
 %}
 
-ws     [ \t\f\n]+
+ws     [ \t\f]+
 DIGIT  [0-9]
 LETTER [a-zA-Z]
 string_literal \"(\\.|[^\\"])*\"
@@ -21,8 +21,7 @@ string_literal \"(\\.|[^\\"])*\"
 %%
 
 {ws}     ;
-
-\n			{ line_num++ }
+\n			{ line_num++; }
 "if"		{ return IF; }
 "else"      { return ELSE; }
 "("			{ return LPAR; }
@@ -47,10 +46,5 @@ string_literal \"(\\.|[^\\"])*\"
 {DIGIT}+            { yylval.num = atof(yytext); return NUMBER;	}
 {LETTER}[0-9a-zA-Z]*    { yylval.id = strdup(yytext); return ID; }
 {string_literal}	{ str_val = strdup(yytext); return STRING; }
-
-. { BEGIN(ERROR); yymore(); }
-<ERROR>[^{DIGIT}{LETTER}+\-/*(){}= \t\n\f\r] { yymore(); }
-<ERROR>(.|\n) { yyless(yyleng-1); printf("error token: %s on line %d\n", yytext, line_num); 
-           BEGIN(INITIAL); }
 
 %%

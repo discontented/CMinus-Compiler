@@ -19,6 +19,8 @@ void output_tabs(int n)
     }
 }
 
+/* Conditions Nodes */
+
 or_cond_node::or_cond_node(cond_node *L, cond_node *R) : left(L), right(R)
 {
 }
@@ -111,6 +113,10 @@ bool prim_cond_node::evaluate()
         break;
     }
 }
+
+/* End Condition Node */
+
+/* Expression Nodes */
 
 // the constructor for node links the node to its children,
 // and stores the character representation of the operator.
@@ -276,6 +282,10 @@ ife_stmt::ife_stmt(test *condition, statement *thenbranch, statement *elsebranch
     this->elsebranch = elsebranch;
 }
 
+/* End Expression Nodes */
+
+/* Statement Nodes */
+
 void ife_stmt::print(int n)
 {
     output_tabs(n);
@@ -305,15 +315,6 @@ void ife_stmt::evaluate()
     }
 }
 
-TLABEL ife_stmt::labelling(TLABEL next)
-{
-    TLABEL next1, next2, next3;
-    next1 = condition->labelling(next);
-    next2 = thenbranch->labelling(next1);
-    next3 = elsebranch->labelling(next2);
-    return next3;
-}
-
 while_stmt::while_stmt(test *condition, statement *bodystmt)
 {
     this->condition = condition;
@@ -339,14 +340,6 @@ void while_stmt::evaluate()
     }
 }
 
-TLABEL while_stmt::labelling(TLABEL next)
-{
-    TLABEL next1, next2;
-    next1 = condition->labelling(next);
-    next2 = bodystmt->labelling(next1);
-    return next2;
-}
-
 input_stmt::input_stmt(string name)
     : id(name) {}
 
@@ -354,7 +347,6 @@ void input_stmt::print(int n)
 {
     output_tabs(n);
     cout << "read " << id;
-    cout << " /* block " << mylabel << " */";
 }
 
 void input_stmt::evaluate()
@@ -377,7 +369,6 @@ void assignment_stmt::print(int n)
     output_tabs(n);
     cout << id << " = ";
     exp->print();
-    cout << " /* block " << mylabel << " */";
 }
 
 void assignment_stmt::evaluate()
@@ -394,7 +385,6 @@ void print_stmt::print(int n)
     output_tabs(n);
     cout << "print ";
     exp->print();
-    cout << " /* block " << mylabel << " */";
 }
 
 void print_stmt::evaluate()
@@ -409,7 +399,6 @@ void skip_stmt::evaluate() {}
 void skip_stmt::print(int n)
 {
     output_tabs(n);
-    cout << " /* block " << mylabel << " */" << endl;
 }
 
 sequence_stmt::sequence_stmt(statement *mystmt1, statement *mystmt2) : stmt1(mystmt1), stmt2(mystmt2)
@@ -429,13 +418,7 @@ void sequence_stmt::evaluate()
     stmt2->evaluate();
 }
 
-TLABEL sequence_stmt::labelling(TLABEL next)
-{
-    TLABEL next1, next2;
-    next1 = stmt1->labelling(next);
-    next2 = stmt2->labelling(next1);
-    return next2;
-}
+/* End statement nodes */
 
 bool test::evaluate()
 {
@@ -445,7 +428,6 @@ bool test::evaluate()
 void test::print()
 {
     condition->print();
-    cout << " /* block " << mylabel << " */";
 }
 
 test::test(cond_node *condition)

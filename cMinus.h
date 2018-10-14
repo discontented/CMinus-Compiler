@@ -158,15 +158,7 @@ class prim_cond_node : public cond_node
     bool evaluate();
 };
 
-typedef int TLABEL;
-
-class basic_block
-{
-  protected:
-    TLABEL mylabel;
-};
-
-class test : public basic_block
+class test
 {
   private:
     cond_node *condition;
@@ -175,11 +167,6 @@ class test : public basic_block
     test(cond_node *condition);
     void print();
     bool evaluate();
-    TLABEL labelling(TLABEL next)
-    {
-        mylabel = next;
-        return next + 1;
-    }
 };
 
 class statement
@@ -187,7 +174,6 @@ class statement
   public:
     virtual void print(int) {}
     virtual void evaluate() = 0;
-    virtual TLABEL labelling(TLABEL next) = 0;
 };
 
 class ife_stmt : public statement
@@ -200,7 +186,6 @@ class ife_stmt : public statement
     ife_stmt(test *condition, statement *thenbranch, statement *elsebranch);
     void print(int);
     void evaluate();
-    TLABEL labelling(TLABEL);
 };
 
 class while_stmt : public statement
@@ -213,10 +198,9 @@ class while_stmt : public statement
     while_stmt(test *condition, statement *bodystmt);
     void print(int);
     void evaluate();
-    TLABEL labelling(TLABEL);
 };
 
-class input_stmt : public statement, basic_block
+class input_stmt : public statement
 {
   protected:
     string id;
@@ -225,14 +209,9 @@ class input_stmt : public statement, basic_block
     input_stmt(string name);
     void print(int);
     void evaluate();
-    TLABEL labelling(TLABEL next)
-    {
-        mylabel = next;
-        return next + 1;
-    }
 };
 
-class assignment_stmt : public statement, public basic_block
+class assignment_stmt : public statement
 {
   protected:
     string id;
@@ -242,14 +221,9 @@ class assignment_stmt : public statement, public basic_block
     assignment_stmt(string name, exp_node *expression);
     void print(int);
     void evaluate();
-    TLABEL labelling(TLABEL next)
-    {
-        mylabel = next;
-        return next + 1;
-    }
 };
 
-class print_stmt : public statement, public basic_block
+class print_stmt : public statement
 {
   protected:
     exp_node *exp;
@@ -258,24 +232,14 @@ class print_stmt : public statement, public basic_block
     print_stmt(exp_node *myexp);
     void print(int);
     void evaluate();
-    TLABEL labelling(TLABEL next)
-    {
-        mylabel = next;
-        return next + 1;
-    }
 };
 
-class skip_stmt : public statement, public basic_block
+class skip_stmt : public statement
 {
   public:
     skip_stmt();
     void print(int);
     void evaluate();
-    TLABEL labelling(TLABEL next)
-    {
-        mylabel = next;
-        return next + 1;
-    }
 };
 
 class sequence_stmt : public statement
@@ -287,5 +251,14 @@ class sequence_stmt : public statement
     sequence_stmt(statement *mystmt1, statement *mystmt2);
     void print(int);
     void evaluate();
-    TLABEL labelling(TLABEL);
+};
+
+class expression_stmt : public statement
+{
+  protected:
+    exp_node *exp;
+
+  public:
+    void print();
+    void evaluate();
 };

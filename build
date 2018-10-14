@@ -1,0 +1,4 @@
+#!/bin/bash
+
+bison syntax.y
+g++ syntax.tab.c 2> error.log

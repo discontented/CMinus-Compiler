@@ -1,0 +1,47 @@
+syntax.y: In function ‘int yyparse()’:
+syntax.y:140:66: error: no matching function for call to ‘test::test(exp_node*&)’
+     IF LPAR expression RPAR stmt ELSE stmt { $$ = new ife_stmt(new test($3), $5, $7); }
+                                                                  ^
+In file included from syntax.y:14:0:
+cMinus.h:167:5: note: candidate: test::test(cond_node*)
+     test(cond_node *condition);
+     ^~~~
+cMinus.h:167:5: note:   no known conversion for argument 1 from ‘exp_node*’ to ‘cond_node*’
+cMinus.h:161:7: note: candidate: constexpr test::test(const test&)
+ class test
+       ^~~~
+cMinus.h:161:7: note:   no known conversion for argument 1 from ‘exp_node*’ to ‘const test&’
+cMinus.h:161:7: note: candidate: constexpr test::test(test&&)
+cMinus.h:161:7: note:   no known conversion for argument 1 from ‘exp_node*’ to ‘test&&’
+syntax.y:144:68: error: no matching function for call to ‘test::test(exp_node*&)’
+     WHILE LPAR expression RPAR stmt { $$ = new while_stmt(new test($3), $5); }
+                                                                    ^
+In file included from syntax.y:14:0:
+cMinus.h:167:5: note: candidate: test::test(cond_node*)
+     test(cond_node *condition);
+     ^~~~
+cMinus.h:167:5: note:   no known conversion for argument 1 from ‘exp_node*’ to ‘cond_node*’
+cMinus.h:161:7: note: candidate: constexpr test::test(const test&)
+ class test
+       ^~~~
+cMinus.h:161:7: note:   no known conversion for argument 1 from ‘exp_node*’ to ‘const test&’
+cMinus.h:161:7: note: candidate: constexpr test::test(test&&)
+cMinus.h:161:7: note:   no known conversion for argument 1 from ‘exp_node*’ to ‘test&&’
+syntax.y:155:62: error: no matching function for call to ‘expression_stmt::expression_stmt(exp_node*&)’
+     expression {$$ = new expression_stmt($1); }
+                                                              ^
+In file included from syntax.y:14:0:
+cMinus.h:256:7: note: candidate: expression_stmt::expression_stmt()
+ class expression_stmt : public statement
+       ^~~~~~~~~~~~~~~
+cMinus.h:256:7: note:   candidate expects 0 arguments, 1 provided
+cMinus.h:256:7: note: candidate: constexpr expression_stmt::expression_stmt(const expression_stmt&)
+cMinus.h:256:7: note:   no known conversion for argument 1 from ‘exp_node*’ to ‘const expression_stmt&’
+cMinus.h:256:7: note: candidate: constexpr expression_stmt::expression_stmt(expression_stmt&&)
+cMinus.h:256:7: note:   no known conversion for argument 1 from ‘exp_node*’ to ‘expression_stmt&&’
+syntax.y:160:52: error: cannot convert ‘cond_node*’ to ‘exp_node*’ in assignment
+     | boolean_expr {$$ = $1;}
+                                                    ^
+syntax.y:165:88: error: cannot convert ‘assignment_stmt*’ to ‘exp_node*’ in assignment
+     ID '=' expression {$$ = new assignment_stmt($1, $3);}
+                                                                                        ^

@@ -12,17 +12,17 @@ void yyerror(char const *);
 #include <map>
 #include <list>
 #include "cMinus.h"
-
+#define YYDEBUG 1
 
 using namespace std;
 
- extern FILE *yyin;
+extern FILE *yyin;
 
 // the root of the abstract syntax tree
- statement *root;
+statement *root;
 
 // for keeping track of line numbers in the program we are parsing
-  int line_num = 1;
+int line_num = 1;
 
 // function prototypes, we need the yylex return prototype so C++ won't complain
 int yylex();
@@ -56,8 +56,9 @@ void yyerror(const char* s);
 // %type <exp_node_ptr> function_call
 %type <exp_node_ptr> factor
 %type <st> statement_list
-%type <st> statement
+%type <st> stmt
 %type <st> program
+%type <st> expression_stmt
 // %type <st> declarator
 // %type <st> declarator_list
 %type <st> while_statement
@@ -88,27 +89,27 @@ function_declaration:
     ;
 
 function_call:
-    ID LPAR parameter_list RPAR {;}
+    ID LPAR parameter_list RPAR
     ;
 */
 
 statement_list:
-    statement_list SEMI statement { $$ = new sequence_node($1, $3); }
+    statement_list SEMI stmt { $$ = new sequence_stmt($1, $3); }
     | statement_list SEMI error { $$ = $1; yyclearin; }
-    | statement { $$ = $1; }
+    | stmt { $$ = $1; }
     ;
 
-statement:
-    expression { $$ = $1;}
-    | if_statement { $$ = $1;}
-    | while_statement { $$ = $1;}
+stmt:
+    expression_stmt { $$ = $1; }
+    | if_statement { $$ = $1; }
+    | while_statement { $$ = $1; } 
     // | return_statement { $$ = $1;}
-    | LCURL statement RCURL { $$ = $2; }
+    | LCURL stmt RCURL { $$ = $2; }
     | { $$ = new skip_stmt(); }
     ;
 /*
 var_declaration:
-    type declarator_list { $$ = $2 }
+    type declarator_list { $$ = $2; }
     ;
 
 type:
@@ -134,12 +135,13 @@ declarator:
     | assign_expr { $$ = $1; }
     ;    
 */
+
 if_statement:
-    IF LPAR expression RPAR statement ELSE statement { $$ = new ife_stmt(new test($3), $5, $7); }
+    IF LPAR expression RPAR stmt ELSE stmt { $$ = new ife_stmt(new test($3), $5, $7); }
     ;
 
 while_statement:
-    WHILE LPAR expression RPAR statement { $$ = new while_stmt(new test($3), $5); }
+    WHILE LPAR expression RPAR stmt { $$ = new while_stmt(new test($3), $5); }
     ;
 
 /*
@@ -149,6 +151,10 @@ return_statement:
     ;
 */
 
+expression_stmt: 
+    expression {$$ = new expression_stmt($1); }
+    ;
+    
 expression:
     arithmetic_expr {$$ = $1;}
     | boolean_expr {$$ = $1;}
@@ -203,12 +209,9 @@ int main(int argc, char **argv)
 
   cout << "---------- list of input program------------" << endl << endl;
 
-  root -> labelling(1);
-
   root -> print(0); cout<< endl;
 
   cout << "---------- exeuction of input program------------" << endl << endl;
-  
 
   root->evaluate();
 }

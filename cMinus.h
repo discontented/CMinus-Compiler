@@ -259,6 +259,7 @@ class expression_stmt : public statement
     exp_node *exp;
 
   public:
+    expression_stmt(exp_node *myexp);
     void print();
     void evaluate();
 };

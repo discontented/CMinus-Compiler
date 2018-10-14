@@ -8,11 +8,11 @@
     int num_val;
     char *id_val;
     char *str_val;
-    int yylval;
 
     extern int line_num;
 %}
 
+%option noyywrap
 ws     [ \t\f]+
 DIGIT  [0-9]
 LETTER [a-zA-Z]

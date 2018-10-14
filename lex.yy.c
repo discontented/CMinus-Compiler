@@ -322,6 +322,9 @@ void yyfree ( void *  );
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
 /* Begin user sect3 */
+
+#define yywrap() (/*CONSTCOND*/1)
+#define YY_SKIP_YYWRAP
 typedef flex_uint8_t YY_CHAR;
 
 FILE *yyin = NULL, *yyout = NULL;
@@ -497,11 +500,10 @@ char *yytext;
     int num_val;
     char *id_val;
     char *str_val;
-    int yylval;
 
     extern int line_num;
-#line 504 "lex.yy.c"
-#line 505 "lex.yy.c"
+#line 506 "lex.yy.c"
+#line 507 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -721,7 +723,7 @@ YY_DECL
 #line 21 "lexer.l"
 
 
-#line 725 "lex.yy.c"
+#line 727 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -915,7 +917,7 @@ YY_RULE_SETUP
 #line 50 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 919 "lex.yy.c"
+#line 921 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

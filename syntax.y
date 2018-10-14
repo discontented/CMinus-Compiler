@@ -1,7 +1,7 @@
 %{
 // C requires that functions be declared before they are used and the following functions are used by the parser.
-int yylex(void);
-void yyerror(char const *);
+int yylex();
+void yyerror(const char * s);
 
 // Function prototypes go here or must be included as external header.
 
@@ -24,9 +24,6 @@ statement *root;
 // for keeping track of line numbers in the program we are parsing
 int line_num = 1;
 
-// function prototypes, we need the yylex return prototype so C++ won't complain
-int yylex();
-void yyerror(const char* s);
 %}
 
 %start program
@@ -52,13 +49,13 @@ void yyerror(const char* s);
 %type <exp_node_ptr> expression
 %type <exp_node_ptr> multiplicative_expr
 %type <exp_node_ptr> arithmetic_expr
-%type <exp_node_ptr> assign_expr
 // %type <exp_node_ptr> function_call
 %type <exp_node_ptr> factor
 %type <st> statement_list
 %type <st> stmt
 %type <st> program
 %type <st> expression_stmt
+%type <st> assign_stmt
 // %type <st> declarator
 // %type <st> declarator_list
 %type <st> while_statement
@@ -102,7 +99,8 @@ statement_list:
 stmt:
     expression_stmt { $$ = $1; }
     | if_statement { $$ = $1; }
-    | while_statement { $$ = $1; } 
+    | while_statement { $$ = $1; }
+    | assign_stmt { $$ = $1; } 
     // | return_statement { $$ = $1;}
     | LCURL stmt RCURL { $$ = $2; }
     | { $$ = new skip_stmt(); }
@@ -137,11 +135,11 @@ declarator:
 */
 
 if_statement:
-    IF LPAR expression RPAR stmt ELSE stmt { $$ = new ife_stmt(new test($3), $5, $7); }
+    IF LPAR boolean_expr RPAR stmt ELSE stmt { $$ = new ife_stmt(new test($3), $5, $7); }
     ;
 
 while_statement:
-    WHILE LPAR expression RPAR stmt { $$ = new while_stmt(new test($3), $5); }
+    WHILE LPAR boolean_expr RPAR stmt { $$ = new while_stmt(new test($3), $5); }
     ;
 
 /*
@@ -157,11 +155,9 @@ expression_stmt:
     
 expression:
     arithmetic_expr {$$ = $1;}
-    | boolean_expr {$$ = $1;}
-    | assign_expr {$$ = $1;}
     ;
 
-assign_expr:
+assign_stmt:
     ID '=' expression {$$ = new assignment_stmt($1, $3);}
     ;
 
@@ -196,6 +192,7 @@ mul_bexpr:
 
 root_bexpr:
     '!'root_bexpr { $$ = new neg_cond_node($2); }
+    | LPAR boolean_expr RPAR { $$ = $2; }
     | arithmetic_expr RELOP arithmetic_expr { $$ = new prim_cond_node($2, $1, $3); }
     ;
 
@@ -204,7 +201,7 @@ int main(int argc, char **argv)
 { 
   if (argc>1) yyin=fopen(argv[1],"r");
 
-  //  yydebug = 1;
+   yydebug = 1;
   yyparse();
 
   cout << "---------- list of input program------------" << endl << endl;
@@ -216,7 +213,7 @@ int main(int argc, char **argv)
   root->evaluate();
 }
 
-void yyerror(char * s)
+void yyerror(const char * s)
 {
   fprintf(stderr, "line %d: %s\n", line_num, s);
 }

@@ -418,6 +418,14 @@ void sequence_stmt::evaluate()
     stmt2->evaluate();
 }
 
+expression_stmt::expression_stmt(exp_node *myexp) : exp(myexp) {}
+
+void expression_stmt::print() {}
+
+void expression_stmt::evaluate()
+{
+    exp->evaluate();
+}
 /* End statement nodes */
 
 bool test::evaluate()

@@ -37,6 +37,8 @@ int line_num = 1;
   statement *st;
 }
 
+%error-verbose
+
 /* Bison Declarations */
 %token IF WHILE ELSE
 %token SEMI COMMA LPAR RPAR LCURL RCURL
@@ -105,7 +107,7 @@ stmt:
     | while_statement { $$ = $1; }
     | assign_stmt { $$ = $1; } 
     // | return_statement { $$ = $1;}
-    | LCURL stmt RCURL { $$ = $2; }
+    | LCURL statement_list RCURL { $$ = $2; }
     | { $$ = new skip_stmt(); }
     ;
 /*

@@ -44,6 +44,7 @@ int line_num = 1;
 %token RETURN
 %token AND OR NOT
 %token EQUALS PLUS MINUS TIMES DIVIDE
+%token PRINT
 %token <num> NUMBER
 %token <id> ID
 %token <oper> RELOP
@@ -99,6 +100,7 @@ statement_list:
 
 stmt:
     expression_stmt { $$ = $1; }
+    | PRINT expression { $$ = new print_stmt($2); }
     | if_statement { $$ = $1; }
     | while_statement { $$ = $1; }
     | assign_stmt { $$ = $1; } 

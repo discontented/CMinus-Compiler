@@ -26,18 +26,7 @@ string_literal \"(\\.|[^\\"])*\"
 \n			{ line_num++; }
 "if"		{ return IF; }
 "else"      { return ELSE; }
-"("			{ return LPAR; }
-")"			{ return RPAR; }
-"{"			{ return LCURL; }
-"}"			{ return RCURL; }
 "while"		{ return WHILE; }
-";"			{ return SEMI; }
-","			{ return COMMA; }
-"-"         { return MINUS; }
-"+"         { return PLUS; }
-"*"         { return TIMES; }
-"/"         { return DIVIDE; }
-"="         { return EQUALS; }
 "int"		{ return INT; }
 "string"    { return STRING; }
 "float"		{ return FLOAT; }
@@ -45,6 +34,18 @@ string_literal \"(\\.|[^\\"])*\"
 "boolean"	{ return BOOL; }
 "void"		{ return VOID; }    
 "return"	{ return RETURN; }
+"print"     { return PRINT; }
+"("			{ return LPAR; }
+")"			{ return RPAR; }
+"{"			{ return LCURL; }
+"}"			{ return RCURL; }
+";"			{ return SEMI; }
+","			{ return COMMA; }
+"-"         { return MINUS; }
+"+"         { return PLUS; }
+"*"         { return TIMES; }
+"/"         { return DIVIDE; }
+"="         { return EQUALS; }
 "!"         { return NOT; }
 "&&"        { return AND; }
 "||"        { return OR; }

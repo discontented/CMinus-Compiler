@@ -3,3 +3,9 @@ syntax.tab.*
 y.tab.*
 lex.yy.*
 cMinus.o
+imp.o
+logs/
+
+# Local test files
+print.*
+printer

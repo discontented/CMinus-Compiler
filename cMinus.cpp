@@ -275,16 +275,17 @@ float unary_minus_node::evaluate()
     return -expValue;
 }
 
+
+/* End Expression Nodes */
+
+/* Statement Nodes */
+
 ife_stmt::ife_stmt(test *condition, statement *thenbranch, statement *elsebranch)
 {
     this->condition = condition;
     this->thenbranch = thenbranch;
     this->elsebranch = elsebranch;
 }
-
-/* End Expression Nodes */
-
-/* Statement Nodes */
 
 void ife_stmt::print(int n)
 {

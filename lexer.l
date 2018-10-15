@@ -18,6 +18,8 @@ DIGIT  [0-9]
 LETTER [a-zA-Z]
 string_literal \"(\\.|[^\\"])*\"
 
+%x ERROR
+
 %%
 
 {ws}     ;
@@ -31,6 +33,11 @@ string_literal \"(\\.|[^\\"])*\"
 "while"		{ return WHILE; }
 ";"			{ return SEMI; }
 ","			{ return COMMA; }
+"-"         { return MINUS; }
+"+"         { return PLUS; }
+"*"         { return TIMES; }
+"/"         { return DIVIDE; }
+"="         { return EQUALS; }
 "int"		{ return INT; }
 "string"    { return STRING; }
 "float"		{ return FLOAT; }
@@ -46,5 +53,11 @@ string_literal \"(\\.|[^\\"])*\"
 {DIGIT}+            { yylval.num = atof(yytext); return NUMBER;	}
 {LETTER}[0-9a-zA-Z]*    { yylval.id = strdup(yytext); return ID; }
 {string_literal}	{ str_val = strdup(yytext); return STRING; }
+
+
+. { BEGIN(ERROR); yymore(); }
+<ERROR>[^{DIGIT}{LETTER}+\-/*(){}= \t\n\f\r] { yymore(); }
+<ERROR>(.|\n) { yyless(yyleng-1); printf("error token: %s on line %d\n", yytext, line_num); 
+           BEGIN(INITIAL); }
 
 %%

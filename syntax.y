@@ -43,6 +43,7 @@ int line_num = 1;
 %token INT STRING FLOAT CHAR BOOL VOID
 %token RETURN
 %token AND OR NOT
+%token EQUALS PLUS MINUS TIMES DIVIDE
 %token <num> NUMBER
 %token <id> ID
 %token <oper> RELOP
@@ -158,24 +159,24 @@ expression:
     ;
 
 assign_stmt:
-    ID '=' expression {$$ = new assignment_stmt($1, $3);}
+    ID EQUALS expression {$$ = new assignment_stmt($1, $3);}
     ;
 
 arithmetic_expr:
-    arithmetic_expr '+' multiplicative_expr { $$ = new plus_node($1, $3); }
-    | arithmetic_expr '-' multiplicative_expr { $$ = new minus_node($1, $3); }
+    arithmetic_expr PLUS multiplicative_expr { $$ = new plus_node($1, $3); }
+    | arithmetic_expr MINUS multiplicative_expr { $$ = new minus_node($1, $3); }
     | multiplicative_expr { $$ = $1; }
     ;
 
 multiplicative_expr:
-    multiplicative_expr '*' factor { $$ = new times_node( $1, $3); }
-    | multiplicative_expr '/' factor { $$ = new divide_node( $1, $3); }
+    multiplicative_expr TIMES factor { $$ = new times_node( $1, $3); }
+    | multiplicative_expr DIVIDE factor { $$ = new divide_node( $1, $3); }
     | factor { $$ = $1; }                    
     ;
 
 factor:
     LPAR arithmetic_expr RPAR {$$ = $2; }
-    | '-'factor  {$$ = new unary_minus_node($2); }
+    | MINUS factor  {$$ = new unary_minus_node($2); }
     | NUMBER {$$ = new number_node($1); }
     | ID  {$$ = new id_node($1); }
     ;
@@ -191,7 +192,7 @@ mul_bexpr:
     ;
 
 root_bexpr:
-    '!'root_bexpr { $$ = new neg_cond_node($2); }
+    NOT root_bexpr { $$ = new neg_cond_node($2); }
     | LPAR boolean_expr RPAR { $$ = $2; }
     | arithmetic_expr RELOP arithmetic_expr { $$ = new prim_cond_node($2, $1, $3); }
     ;

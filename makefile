@@ -4,21 +4,24 @@ LEX = flex
 LFLAGS= -8     
 YACC= bison 
 YFLAGS= -d -t -y
+F_BISON = syntax
+F_LEX = lexer
+F_CPP = cMinus
 
 RM = /bin/rm -f
 
-imp: y.tab.o lex.yy.o cMinus.o
-	${CCC} ${CCFLAGS} lex.yy.o y.tab.o cMinus.o -o imp 
+${F_CPP}: y.tab.o lex.yy.o ${F_CPP}.o
+	${CCC} ${CCFLAGS} lex.yy.o y.tab.o ${F_CPP}.o -o ${F_BISON}
 
-imp.o: cMinus.cpp cMinus.h
-	${CCC} -c imp.cpp
-y.tab.o: syntax.y
-	${YACC} ${YFLAGS} syntax.y
+${F_CPP}.o: ${F_CPP}.cpp ${F_CPP}.h
+	${CCC} -c ${F_CPP}.cpp
+y.tab.o: ${F_BISON}.y
+	${YACC} ${YFLAGS} ${F_BISON}.y
 	${CCC} ${CCFLAGS} y.tab.c -c 
 
-lex.yy.o: lexer.l
-	${LEX} $(LFLAGS) lexer.l
+lex.yy.o: ${F_LEX}.l
+	${LEX} $(LFLAGS) ${F_LEX}.l
 	${CCC} ${CCFLAGS} lex.yy.c -c 
 
 clean:
-	/bin/rm -f lex.yy.* y.tab.* *.o imp
+	/bin/rm -f lex.yy.* y.tab.* *.o ${F_BISON}

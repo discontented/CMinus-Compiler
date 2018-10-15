@@ -140,7 +140,8 @@ declarator:
 */
 
 if_statement:
-    IF LPAR boolean_expr RPAR stmt ELSE stmt { $$ = new ife_stmt(new test($3), $5, $7); }
+	IF LPAR boolean_expr RPAR stmt { $$ = new ife_stmt(new test($3), $5, new skip_stmt()); }
+	| IF LPAR boolean_expr RPAR stmt ELSE stmt { $$ = new ife_stmt(new test($3), $5, $7); }
     ;
 
 while_statement:

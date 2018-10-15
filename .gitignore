@@ -5,6 +5,7 @@ lex.yy.*
 cMinus.o
 imp.o
 logs/
+~$myC-.docx
 
 # Local test files
 print.*

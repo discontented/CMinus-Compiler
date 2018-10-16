@@ -7,7 +7,9 @@
 
 using namespace std;
 
-map<string, float> state;
+map<string, float> state_float;
+map<string, int> state_int;
+map<string, string> state_string;
 
 // preconditon: n>=0
 void output_tabs(int n)
@@ -86,12 +88,24 @@ void prim_cond_node::print()
 	left->print();
 	switch (op)
 	{
-	case GE:
+	case GT:
 		cout << ">";
 		break;
+    case GE:
+        cout << ">=";
+        break;
+    case LT:
+        cout << "<";
+        break;
+    case LE:
+        cout << "<=";
+        break;
 	case EQ:
 		cout << "==";
 		break;
+    case NO:
+        cout << "!=";
+        break;
 	}
 	right->print();
 }
@@ -105,11 +119,23 @@ bool prim_cond_node::evaluate()
 
 	switch (op)
 	{
-	case GE:
+    case GT:
 		return (opdl > opdr);
+		break;        
+	case GE:
+		return (opdl >= opdr);
+		break;
+    case LT:
+		return (opdl < opdr);
+		break;
+    case LE:
+		return (opdl <= opdr);
 		break;
 	case EQ:
 		return (opdl == opdr);
+		break;
+    case NO:
+		return (opdl != opdr);
 		break;
 	}
 }
@@ -150,7 +176,7 @@ void id_node::print()
 
 float id_node::evaluate()
 {
-	return state[id];
+	return state_float[id];
 }
 
 // plus_node inherits the characteristics of node and adds its own evaluate function
@@ -354,7 +380,7 @@ void input_stmt::evaluate()
 
 	cin >> result;
 
-	state[id] = result;
+	state_float[id] = result;
 }
 
 assignment_stmt::assignment_stmt(string name, exp_node *expression)
@@ -372,7 +398,7 @@ void assignment_stmt::evaluate()
 {
 	float result = exp->evaluate();
 
-	state[id] = result;
+	state_float[id] = result;
 }
 
 print_stmt::print_stmt(exp_node *myexp) : exp(myexp) {}

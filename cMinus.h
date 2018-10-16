@@ -9,7 +9,11 @@ using namespace std;
 enum operation
 {
 	EQ,
-	GE
+	GT,
+    GE,
+    LT,
+    LE,
+    NO
 };
 
 class exp_node
@@ -275,4 +279,8 @@ class func_stmt : public statement
 	func_stmt(id_node *myID, id_node *myParam, sequence_stmt *myBlock);
 	void print();
 	void evaluate();
-}
+};
+
+extern map<string, float> state_float;
+extern map<string, int> state_int;
+extern map<string, string> state_string;

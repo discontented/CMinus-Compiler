@@ -50,7 +50,11 @@ string_literal \"(\\.|[^\\"])*\"
 "&&"        { return AND; }
 "||"        { return OR; }
 "=="                {yylval.oper = EQ; return RELOP;}
-">"                 {yylval.oper = GE; return RELOP;}
+">"                 {yylval.oper = GT; return RELOP;}
+">="                {yylval.oper = GE; return RELOP;}
+"<"                 {yylval.oper = LT; return RELOP;}
+"<="                {yylval.oper = LE; return RELOP;}
+"!="                {yylval.oper = NO; return RELOP;}
 {DIGIT}+            { yylval.num = atof(yytext); return NUMBER;	}
 {LETTER}[0-9a-zA-Z]*    { yylval.id = strdup(yytext); return ID; }
 {string_literal}	{ str_val = strdup(yytext); return STRING; }

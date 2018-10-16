@@ -4,7 +4,7 @@ LEX = flex
 LFLAGS= -8     
 YACC= bison 
 YFLAGS= -d -t -y
-F_BISON = function
+F_BISON = syntax
 F_LEX = lexer
 F_CPP = cMinus
 

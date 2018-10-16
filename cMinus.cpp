@@ -315,11 +315,12 @@ ife_stmt::ife_stmt(test *condition, statement *thenbranch, statement *elsebranch
 void ife_stmt::print(int n)
 {
 	output_tabs(n);
-	cout << "if ";
+	cout << "if (";
 	condition->print();
+	cout << ")";
 	cout << endl;
 	output_tabs(n);
-	cout << "then { " << endl;
+	cout << " { " << endl;
 	thenbranch->print(n + 1);
 	cout << "} " << endl;
 	output_tabs(n);

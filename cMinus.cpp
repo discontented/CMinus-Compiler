@@ -91,21 +91,21 @@ void prim_cond_node::print()
 	case GT:
 		cout << ">";
 		break;
-    case GE:
-        cout << ">=";
-        break;
-    case LT:
-        cout << "<";
-        break;
-    case LE:
-        cout << "<=";
-        break;
+	case GE:
+		cout << ">=";
+		break;
+	case LT:
+		cout << "<";
+		break;
+	case LE:
+		cout << "<=";
+		break;
 	case EQ:
 		cout << "==";
 		break;
-    case NO:
-        cout << "!=";
-        break;
+	case NO:
+		cout << "!=";
+		break;
 	}
 	right->print();
 }
@@ -119,22 +119,22 @@ bool prim_cond_node::evaluate()
 
 	switch (op)
 	{
-    case GT:
+	case GT:
 		return (opdl > opdr);
-		break;        
+		break;
 	case GE:
 		return (opdl >= opdr);
 		break;
-    case LT:
+	case LT:
 		return (opdl < opdr);
 		break;
-    case LE:
+	case LE:
 		return (opdl <= opdr);
 		break;
 	case EQ:
 		return (opdl == opdr);
 		break;
-    case NO:
+	case NO:
 		return (opdl != opdr);
 		break;
 	}
@@ -324,6 +324,9 @@ void ife_stmt::print(int n)
 	thenbranch->print(n + 1);
 	cout << "} " << endl;
 	output_tabs(n);
+	cout << "else { " << endl;
+	elsebranch->print(n + 1);
+	cout << "} ";
 }
 
 void ife_stmt::evaluate()
@@ -348,9 +351,9 @@ while_stmt::while_stmt(test *condition, statement *bodystmt)
 void while_stmt::print(int n)
 {
 	output_tabs(n);
-	cout << "while ";
+	cout << "while (";
 	condition->print();
-	cout << " do {" << endl;
+	cout << ") {" << endl;
 	bodystmt->print(n + 1);
 	cout << "} ";
 }
@@ -466,4 +469,3 @@ test::test(cond_node *condition)
 {
 	this->condition = condition;
 }
-

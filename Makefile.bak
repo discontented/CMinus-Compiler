@@ -15,6 +15,7 @@ ${F_CPP}: y.tab.o lex.yy.o ${F_CPP}.o
 
 ${F_CPP}.o: ${F_CPP}.cpp ${F_CPP}.h
 	${CCC} -c ${F_CPP}.cpp
+
 y.tab.o: ${F_BISON}.y
 	${YACC} ${YFLAGS} ${F_BISON}.y
 	${CCC} ${CCFLAGS} y.tab.c -c 

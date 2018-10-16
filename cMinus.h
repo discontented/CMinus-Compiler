@@ -10,15 +10,15 @@ enum operation
 {
 	EQ,
 	GT,
-    GE,
-    LT,
-    LE,
-    NO
+	GE,
+	LT,
+	LE,
+	NO
 };
 
 class exp_node
 {
-  public:
+public:
 	// print function for pretty printing an expression
 	virtual void print() = 0;
 
@@ -28,7 +28,7 @@ class exp_node
 
 class operator_node : public exp_node
 {
-  public:
+public:
 	exp_node *left;
 	exp_node *right;
 
@@ -39,10 +39,10 @@ class operator_node : public exp_node
 
 class number_node : public exp_node
 {
-  private:
+private:
 	float num;
 
-  public:
+public:
 	number_node(float value);
 	void print();
 	float evaluate();
@@ -50,10 +50,10 @@ class number_node : public exp_node
 
 class unary_minus_node : public exp_node
 {
-  protected:
+protected:
 	exp_node *exp;
 
-  public:
+public:
 	unary_minus_node(exp_node *exp);
 	void print();
 	float evaluate();
@@ -61,10 +61,10 @@ class unary_minus_node : public exp_node
 
 class id_node : public exp_node
 {
-  protected:
+protected:
 	string id;
 
-  public:
+public:
 	id_node(string value);
 	void print();
 	float evaluate();
@@ -73,7 +73,7 @@ class id_node : public exp_node
 // plus_node inherits the characteristics of node and adds its own evaluate function
 class plus_node : public operator_node
 {
-  public:
+public:
 	// plus_node's constructor just uses node's constructor
 	plus_node(exp_node *L, exp_node *R);
 	void print();
@@ -83,7 +83,7 @@ class plus_node : public operator_node
 // minus_node inherits the characteristics of node and adds its own evaluate function
 class minus_node : public operator_node
 {
-  public:
+public:
 	minus_node(exp_node *L, exp_node *R);
 	void print();
 	float evaluate();
@@ -92,7 +92,7 @@ class minus_node : public operator_node
 // times_node inherits the characteristics of node and adds its own evaluate function
 class times_node : public operator_node
 {
-  public:
+public:
 	times_node(exp_node *L, exp_node *R);
 	void print();
 	float evaluate();
@@ -101,7 +101,7 @@ class times_node : public operator_node
 // divide_node inherits the characteristics of node and adds its own evaluate function
 class divide_node : public operator_node
 {
-  public:
+public:
 	divide_node(exp_node *L, exp_node *R);
 	void print();
 	float evaluate();
@@ -109,7 +109,7 @@ class divide_node : public operator_node
 
 class cond_node
 {
-  public:
+public:
 	// print function for pretty printing an expression
 	virtual void print() = 0;
 
@@ -119,10 +119,10 @@ class cond_node
 
 class or_cond_node : public cond_node
 {
-  private:
+private:
 	cond_node *left, *right;
 
-  public:
+public:
 	or_cond_node(cond_node *L, cond_node *R);
 	void print();
 	bool evaluate();
@@ -130,10 +130,10 @@ class or_cond_node : public cond_node
 
 class and_cond_node : public cond_node
 {
-  private:
+private:
 	cond_node *left, *right;
 
-  public:
+public:
 	and_cond_node(cond_node *L, cond_node *R);
 	void print();
 	bool evaluate();
@@ -141,10 +141,10 @@ class and_cond_node : public cond_node
 
 class neg_cond_node : public cond_node
 {
-  private:
+private:
 	cond_node *child;
 
-  public:
+public:
 	neg_cond_node(cond_node *child);
 	void print();
 	bool evaluate();
@@ -152,11 +152,11 @@ class neg_cond_node : public cond_node
 
 class prim_cond_node : public cond_node
 {
-  private:
+private:
 	operation op;
 	exp_node *left, *right;
 
-  public:
+public:
 	prim_cond_node(operation op, exp_node *L, exp_node *R);
 	void print();
 	bool evaluate();
@@ -164,10 +164,10 @@ class prim_cond_node : public cond_node
 
 class test
 {
-  private:
+private:
 	cond_node *condition;
 
-  public:
+public:
 	test(cond_node *condition);
 	void print();
 	bool evaluate();
@@ -175,18 +175,18 @@ class test
 
 class statement
 {
-  public:
+public:
 	virtual void print(int) {}
 	virtual void evaluate() = 0;
 };
 
 class ife_stmt : public statement
 {
-  protected:
+protected:
 	test *condition;
 	statement *thenbranch, *elsebranch;
 
-  public:
+public:
 	ife_stmt(test *condition, statement *thenbranch, statement *elsebranch);
 	void print(int);
 	void evaluate();
@@ -194,11 +194,11 @@ class ife_stmt : public statement
 
 class while_stmt : public statement
 {
-  protected:
+protected:
 	test *condition;
 	statement *bodystmt;
 
-  public:
+public:
 	while_stmt(test *condition, statement *bodystmt);
 	void print(int);
 	void evaluate();
@@ -206,10 +206,10 @@ class while_stmt : public statement
 
 class input_stmt : public statement
 {
-  protected:
+protected:
 	string id;
 
-  public:
+public:
 	input_stmt(string name);
 	void print(int);
 	void evaluate();
@@ -217,11 +217,11 @@ class input_stmt : public statement
 
 class assignment_stmt : public statement
 {
-  protected:
+protected:
 	string id;
 	exp_node *exp;
 
-  public:
+public:
 	assignment_stmt(string name, exp_node *expression);
 	void print(int);
 	void evaluate();
@@ -229,10 +229,10 @@ class assignment_stmt : public statement
 
 class print_stmt : public statement
 {
-  protected:
+protected:
 	exp_node *exp;
 
-  public:
+public:
 	print_stmt(exp_node *myexp);
 	void print(int);
 	void evaluate();
@@ -240,7 +240,7 @@ class print_stmt : public statement
 
 class skip_stmt : public statement
 {
-  public:
+public:
 	skip_stmt();
 	void print(int);
 	void evaluate();
@@ -248,10 +248,10 @@ class skip_stmt : public statement
 
 class sequence_stmt : public statement
 {
-  protected:
+protected:
 	statement *stmt1, *stmt2;
 
-  public:
+public:
 	sequence_stmt(statement *mystmt1, statement *mystmt2);
 	void print(int);
 	void evaluate();
@@ -259,10 +259,10 @@ class sequence_stmt : public statement
 
 class expression_stmt : public statement
 {
-  protected:
+protected:
 	exp_node *exp;
 
-  public:
+public:
 	expression_stmt(exp_node *myexp);
 	void print();
 	void evaluate();
@@ -270,12 +270,12 @@ class expression_stmt : public statement
 
 class func_stmt : public statement
 {
-  protected:
+protected:
 	id_node *id;
 	id_node *param;
 	sequence_stmt *block;
 
-  public:
+public:
 	func_stmt(id_node *myID, id_node *myParam, sequence_stmt *myBlock);
 	void print();
 	void evaluate();

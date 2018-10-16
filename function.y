@@ -76,7 +76,7 @@ program:
     ; function program
 
 function:
-    "def" ID LPAR parameter_list RPAR block {$$ = func_stmt($1, $3, $5); }
+    ID LPAR parameter_list RPAR block {$$ = func_stmt($1, $3, $5); }
 	;
 
 block:

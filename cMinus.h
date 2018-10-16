@@ -16,6 +16,8 @@ enum operation
 	NO
 };
 
+template <typename T>
+
 class exp_node
 {
 public:
@@ -23,43 +25,44 @@ public:
 	virtual void print() = 0;
 
 	// evaluation function for a leaf, replaced for interior nodes
-	virtual float evaluate() = 0;
+	virtual T evaluate() = 0;
 };
 
-class operator_node : public exp_node
+template <typename T>
+class operator_node : public exp_node<T>
 {
 public:
-	exp_node *left;
-	exp_node *right;
+	exp_node<T> *left, *right;
 
 	// the constructor for node links the node to its children,
 	// and stores the character representation of the operator.
-	operator_node(exp_node *L, exp_node *R);
+	operator_node(exp_node<T> *L, exp_node<T> *R);
 };
-
-class number_node : public exp_node
+template <typename T>
+class number_node : public exp_node<T>
 {
 private:
-	float num;
+	T num;
 
 public:
-	number_node(float value);
+	number_node(T value);
 	void print();
-	float evaluate();
+	T evaluate();
 };
-
-class unary_minus_node : public exp_node
+template <typename T>
+class unary_minus_node : public exp_node<T>
 {
 protected:
-	exp_node *exp;
+	exp_node<T> *exp;
 
 public:
-	unary_minus_node(exp_node *exp);
+	unary_minus_node(exp_node<T> *exp);
 	void print();
 	float evaluate();
 };
 
-class id_node : public exp_node
+template <typename T>
+class id_node : public exp_node<T>
 {
 protected:
 	string id;
@@ -70,43 +73,48 @@ public:
 	float evaluate();
 };
 
-// plus_node inherits the characteristics of node and adds its own evaluate function
-class plus_node : public operator_node
+// plus_node inherits the characteristics of node and adds its own evaluatefunction
+template <typename T>
+class plus_node : public operator_node<T>
 {
 public:
 	// plus_node's constructor just uses node's constructor
-	plus_node(exp_node *L, exp_node *R);
+	plus_node(exp_node<T> *L, exp_node<T> *R);
 	void print();
 	float evaluate();
 };
 
 // minus_node inherits the characteristics of node and adds its own evaluate function
-class minus_node : public operator_node
+template <typename T>
+class minus_node : public operator_node<T>
 {
 public:
-	minus_node(exp_node *L, exp_node *R);
+	minus_node(exp_node<T> *L, exp_node<T> *R);
 	void print();
 	float evaluate();
 };
 
 // times_node inherits the characteristics of node and adds its own evaluate function
-class times_node : public operator_node
+template <typename T>
+class times_node : public operator_node<T>
 {
 public:
-	times_node(exp_node *L, exp_node *R);
+	times_node(exp_node<T> *L, exp_node<T> *R);
 	void print();
 	float evaluate();
 };
 
 // divide_node inherits the characteristics of node and adds its own evaluate function
-class divide_node : public operator_node
+template <typename T>
+class divide_node : public operator_node<T>
 {
 public:
-	divide_node(exp_node *L, exp_node *R);
+	divide_node(exp_node<T> *L, exp_node<T> *R);
 	void print();
 	float evaluate();
 };
 
+template <typename T>
 class cond_node
 {
 public:
@@ -114,65 +122,71 @@ public:
 	virtual void print() = 0;
 
 	// evaluation function for a leaf, replaced for interior nodes
-	virtual bool evaluate() = 0;
+	virtual T evaluate() = 0;
 };
 
-class or_cond_node : public cond_node
+template <typename T>
+class or_cond_node : public cond_node<T>
 {
 private:
-	cond_node *left, *right;
+	cond_node<T> *left, *right;
 
 public:
-	or_cond_node(cond_node *L, cond_node *R);
+	or_cond_node(cond_node<T> *L, cond_node<T> *R);
 	void print();
 	bool evaluate();
 };
 
-class and_cond_node : public cond_node
+template <typename T>
+class and_cond_node : public cond_node<T>
 {
 private:
-	cond_node *left, *right;
+	cond_node<T> *left, *right;
 
 public:
-	and_cond_node(cond_node *L, cond_node *R);
+	and_cond_node(cond_node<T> *L, cond_node<T> *R);
 	void print();
 	bool evaluate();
 };
 
-class neg_cond_node : public cond_node
+template <typename T>
+class neg_cond_node : public cond_node<T>
 {
 private:
-	cond_node *child;
+	cond_node<T> *child;
 
 public:
-	neg_cond_node(cond_node *child);
+	neg_cond_node(cond_node<T> *child);
 	void print();
 	bool evaluate();
 };
 
-class prim_cond_node : public cond_node
+template <typename T>
+class prim_cond_node : public cond_node<T>
 {
 private:
 	operation op;
-	exp_node *left, *right;
+	exp_node<T> *left, *right;
 
 public:
-	prim_cond_node(operation op, exp_node *L, exp_node *R);
+	prim_cond_node(operation op, exp_node<T> *L, exp_node<T> *R);
 	void print();
 	bool evaluate();
 };
 
+template <typename T>
 class test
 {
 private:
-	cond_node *condition;
+	cond_node<T> *condition;
 
 public:
-	test(cond_node *condition);
+	test(cond_node<T> *condition);
 	void print();
 	bool evaluate();
 };
 
+template <typename T>
 class statement
 {
 public:
@@ -180,31 +194,33 @@ public:
 	virtual void evaluate() = 0;
 };
 
-class ife_stmt : public statement
+template <typename T>
+class ife_stmt : public statement<T>
 {
 protected:
-	test *condition;
-	statement *thenbranch, *elsebranch;
+	test<T> *condition;
+	statement<T> *thenbranch, *elsebranch;
 
 public:
-	ife_stmt(test *condition, statement *thenbranch, statement *elsebranch);
+	ife_stmt(test<T> *condition, statement<T> *thenbranch, statement<T> *elsebranch);
 	void print(int);
 	void evaluate();
 };
 
-class while_stmt : public statement
+template <typename T>
+class while_stmt : public statement<T>
 {
 protected:
-	test *condition;
-	statement *bodystmt;
+	test<T> *condition;
+	statement<T> *bodystmt;
 
 public:
-	while_stmt(test *condition, statement *bodystmt);
+	while_stmt(test<T> *condition, statement<T> *bodystmt);
 	void print(int);
 	void evaluate();
 };
-
-class input_stmt : public statement
+template <typename T>
+class input_stmt : public statement<T>
 {
 protected:
 	string id;
@@ -214,73 +230,73 @@ public:
 	void print(int);
 	void evaluate();
 };
-
-class assignment_stmt : public statement
+template <typename T>
+class assignment_stmt : public statement<T>
 {
 protected:
 	string id;
-	exp_node *exp;
+	exp_node<T> *exp;
 
 public:
-	assignment_stmt(string name, exp_node *expression);
+	assignment_stmt(string name, exp_node<T> *expression);
 	void print(int);
 	void evaluate();
 };
-
-class print_stmt : public statement
+template <typename T>
+class print_stmt : public statement<T>
 {
 protected:
-	exp_node *exp;
+	exp_node<T> *exp;
 
 public:
-	print_stmt(exp_node *myexp);
+	print_stmt(exp_node<T> *myexp);
 	void print(int);
 	void evaluate();
 };
-
-class skip_stmt : public statement
+template <typename T>
+class skip_stmt : public statement<T>
 {
 public:
 	skip_stmt();
 	void print(int);
 	void evaluate();
 };
-
-class sequence_stmt : public statement
+template <typename T>
+class sequence_stmt : public statement<T>
 {
 protected:
-	statement *stmt1, *stmt2;
+	statement<T> *stmt1, *stmt2;
 
 public:
-	sequence_stmt(statement *mystmt1, statement *mystmt2);
+	sequence_stmt(statement<T> *mystmt1, statement<T> *mystmt2);
 	void print(int);
 	void evaluate();
 };
 
-class expression_stmt : public statement
+template <typename T>
+class expression_stmt : public statement<T>
 {
 protected:
-	exp_node *exp;
+	exp_node<T> *exp;
 
 public:
-	expression_stmt(exp_node *myexp);
+	expression_stmt(exp_node<T> *myexp);
 	void print();
 	void evaluate();
 };
 
-class func_stmt : public statement
+template <typename T>
+class func_stmt : public statement<T>
 {
 protected:
-	id_node *id;
-	id_node *param;
-	sequence_stmt *block;
+	id_node<T> *id;
+	id_node<T> *param;
+	sequence_stmt<T> *block;
 
 public:
-	func_stmt(id_node *myID, id_node *myParam, sequence_stmt *myBlock);
+	func_stmt(id_node<T> *myID, id_node<T> *myParam, sequence_stmt<T> *myBlock);
 	void print();
 	void evaluate();
 };
 
-extern map<string, float> state_float;
-extern map<string, int> state_int;
-extern map<string, string> state_string;
+extern map<string, void*> state;

@@ -7,9 +7,8 @@
 
 using namespace std;
 
-map<string, float> state_float;
-map<string, int> state_int;
-map<string, string> state_string;
+map<string, void*> state;
+
 
 // preconditon: n>=0
 void output_tabs(int n)
@@ -23,11 +22,13 @@ void output_tabs(int n)
 
 /* Conditions Nodes */
 
-or_cond_node::or_cond_node(cond_node *L, cond_node *R) : left(L), right(R)
+template<typename T>
+or_cond_node<T>::or_cond_node(cond_node<T> *L, cond_node<T> *R) : left(L), right(R)
 {
 }
 
-void or_cond_node::print()
+template<typename T>
+void or_cond_node<T>::print()
 {
 	cout << "(";
 	left->print();
@@ -36,16 +37,19 @@ void or_cond_node::print()
 	cout << ")";
 }
 
-bool or_cond_node::evaluate()
+template<typename T>
+bool or_cond_node<T>::evaluate()
 {
 	return (left->evaluate()) || (right->evaluate());
 }
 
-and_cond_node::and_cond_node(cond_node *L, cond_node *R) : left(L), right(R)
+template<typename T>
+and_cond_node<T>::and_cond_node(cond_node<T> *L, cond_node<T> *R) : left(L), right(R)
 {
 }
 
-void and_cond_node::print()
+template<typename T>
+void and_cond_node<T>::print()
 {
 	cout << "(";
 	left->print();
@@ -54,36 +58,42 @@ void and_cond_node::print()
 	cout << ")";
 }
 
-bool and_cond_node::evaluate()
+template<typename T>
+bool and_cond_node<T>::evaluate()
 {
 	return (left->evaluate()) && (right->evaluate());
 }
 
-neg_cond_node::neg_cond_node(cond_node *child)
+template<typename T>
+neg_cond_node<T>::neg_cond_node(cond_node<T> *child)
 {
 	this->child = child;
 }
 
-void neg_cond_node::print()
+template<typename T>
+void neg_cond_node<T>::print()
 {
 	cout << "! (";
 	child->print();
 	cout << ")";
 }
 
-bool neg_cond_node::evaluate()
+template<typename T>
+bool neg_cond_node<T>::evaluate()
 {
 	return !(child->evaluate());
 }
 
-prim_cond_node::prim_cond_node(operation op, exp_node *left, exp_node *right)
+template<typename T>
+prim_cond_node<T>::prim_cond_node(operation<T> op, exp_node<T> *left, exp_node<T> *right)
 {
 	this->op = op;
 	this->left = left;
 	this->right = right;
 }
 
-void prim_cond_node::print()
+template<typename T>
+void prim_cond_node<T>::print()
 {
 	left->print();
 	switch (op)
@@ -110,7 +120,8 @@ void prim_cond_node::print()
 	right->print();
 }
 
-bool prim_cond_node::evaluate()
+template<typename T>
+bool prim_cond_node<T>::evaluate()
 {
 	float opdl, opdr;
 
@@ -146,46 +157,55 @@ bool prim_cond_node::evaluate()
 
 // the constructor for node links the node to its children,
 // and stores the character representation of the operator.
-operator_node::operator_node(exp_node *L, exp_node *R)
+template<typename T>
+operator_node<T>::operator_node(exp_node<T> *L, exp_node<T> *R)
 {
 	left = L;
 	right = R;
 }
 
-number_node::number_node(float value)
+template<typename T>
+number_node<T>::number_node(T value)
 {
 	num = value;
 }
 
-void number_node::print()
+template<typename T>
+void number_node<T>::print()
 {
 	cout << num;
 }
 
-float number_node::evaluate()
+template<typename T>
+float number_node<T>::evaluate()
 {
 	return num;
 }
 
-id_node::id_node(string value) : id(value) {}
+template<typename T>
+id_node<T>::id_node(string value) : id(value) {}
 
-void id_node::print()
+template<typename T>
+void id_node<T>::print()
 {
 	cout << id;
 }
 
-float id_node::evaluate()
+template<typename T>
+float id_node<T>::evaluate()
 {
-	return state_float[id];
+	return state[id];
 }
 
 // plus_node inherits the characteristics of node and adds its own evaluate function
 // plus_node's constructor just uses node's constructor
-plus_node::plus_node(exp_node *L, exp_node *R) : operator_node(L, R)
+template<typename T>
+plus_node<T>::plus_node(exp_node<T> *L, exp_node<T> *R) : operator_node(L, R)
 {
 }
 
-void plus_node::print()
+template<typename T>
+void plus_node<T>::print()
 {
 	cout << "(";
 	left->print();
@@ -194,7 +214,8 @@ void plus_node::print()
 	cout << ")";
 }
 
-float plus_node::evaluate()
+template<typename T>
+float plus_node<T>::evaluate()
 {
 	float left_num, right_num;
 
@@ -205,11 +226,13 @@ float plus_node::evaluate()
 }
 
 // minus_node inherits the characteristics of node and adds its own evaluate function
-minus_node::minus_node(exp_node *L, exp_node *R) : operator_node(L, R)
+template<typename T>
+minus_node<T>::minus_node(exp_node<T> *L, exp_node<T> *R) : operator_node(L, R)
 {
 }
 
-void minus_node::print()
+template<typename T>
+void minus_node<T>::print()
 {
 	cout << "(";
 	left->print();
@@ -218,7 +241,8 @@ void minus_node::print()
 	cout << ")";
 }
 
-float minus_node::evaluate()
+template<typename T>
+float minus_node<T>::evaluate()
 {
 	float left_num, right_num;
 
@@ -229,11 +253,11 @@ float minus_node::evaluate()
 }
 
 // times_node inherits the characteristics of node and adds its own evaluate function
-times_node::times_node(exp_node *L, exp_node *R) : operator_node(L, R)
+times_node<T>::times_node(exp_node<T> *L, exp_node<T> *R) : operator_node(L, R)
 {
 }
-
-void times_node::print()
+template<typename T>
+void times_node<T>::print()
 {
 	cout << "(";
 	left->print();
@@ -241,8 +265,8 @@ void times_node::print()
 	right->print();
 	cout << ")";
 }
-
-float times_node::evaluate()
+template<typename T>
+float times_node<T>::evaluate()
 {
 	float left_num, right_num;
 
@@ -252,9 +276,9 @@ float times_node::evaluate()
 	return left_num * right_num;
 }
 
-// divide_node inherits the characteristics of node and adds its own evaluate function
-
-divide_node::divide_node(exp_node *L, exp_node *R) : operator_node(L, R)
+// divide_node inherits the characteristics of node and adds its own evaluate functiontemplate<typename T>
+template<typename T>
+divide_node<T>::divide_node(exp_node<T> *L, exp_node<T> *R) : operator_node(L, R)
 {
 }
 
@@ -285,17 +309,17 @@ float divide_node::evaluate()
 		exit(1);
 	}
 }
+template<typename T>
+unary_minus_node<T>::unary_minus_node(exp_node<T> *L) : exp(L) {}
 
-unary_minus_node::unary_minus_node(exp_node *L) : exp(L) {}
-
-void unary_minus_node::print()
+void unary_minus_node<T>::print()
 {
 	cout << "- ( ";
 	exp->print();
 	cout << " )";
 }
 
-float unary_minus_node::evaluate()
+float unary_minus_node<T>::evaluate()
 {
 	float expValue = exp->evaluate();
 	return -expValue;
@@ -303,16 +327,14 @@ float unary_minus_node::evaluate()
 
 /* End Expression Nodes */
 
-/* Statement Nodes */
-
-ife_stmt::ife_stmt(test *condition, statement *thenbranch, statement *elsebranch)
+/* Statement Nodes */template<typename T>::ife_stmt(test *condition, statement *thenbranch, statement *elsebranch)
 {
 	this->condition = condition;
 	this->thenbranch = thenbranch;
 	this->elsebranch = elsebranch;
 }
 
-void ife_stmt::print(int n)
+void ife_stmt<T>::print(int n)
 {
 	output_tabs(n);
 	cout << "if (";
@@ -329,7 +351,7 @@ void ife_stmt::print(int n)
 	cout << "} ";
 }
 
-void ife_stmt::evaluate()
+void ife_stmt<T>::evaluate()
 {
 
 	if (condition->evaluate())
@@ -340,15 +362,13 @@ void ife_stmt::evaluate()
 	{
 		elsebranch->evaluate();
 	}
-}
-
-while_stmt::while_stmt(test *condition, statement *bodystmt)
+}template<typename T>::while_stmt(test *condition, statement *bodystmt)
 {
 	this->condition = condition;
 	this->bodystmt = bodystmt;
 }
 
-void while_stmt::print(int n)
+void while_stmt<T>::print(int n)
 {
 	output_tabs(n);
 	cout << "while (";
@@ -367,16 +387,17 @@ void while_stmt::evaluate()
 	}
 }
 
-input_stmt::input_stmt(string name)
+template<typename T>
+input_stmt<T>::input_stmt(string name)
 	: id(name) {}
 
-void input_stmt::print(int n)
+void input_stmt<T>::print(int n)
 {
 	output_tabs(n);
 	cout << "read " << id;
 }
 
-void input_stmt::evaluate()
+void input_stmt<T>::evaluate()
 {
 	float result;
 
@@ -384,10 +405,11 @@ void input_stmt::evaluate()
 
 	cin >> result;
 
-	state_float[id] = result;
+	state[id] = result;
 }
 
-assignment_stmt::assignment_stmt(string name, exp_node *expression)
+template<typename T>
+assignment_stmt<T>::assignment_stmt(string name, exp_node<T> *expression)
 	: id(name), exp(expression) {}
 
 void assignment_stmt::print(int n)
@@ -402,10 +424,11 @@ void assignment_stmt::evaluate()
 {
 	float result = exp->evaluate();
 
-	state_float[id] = result;
+	state[id] = result;
 }
 
-print_stmt::print_stmt(exp_node *myexp) : exp(myexp) {}
+template<typename T>
+print_stmt<T>::print_stmt(exp_node<T> *myexp) : exp(myexp) {}
 
 void print_stmt::print(int n)
 {
@@ -420,7 +443,8 @@ void print_stmt::evaluate()
 		 << endl;
 }
 
-skip_stmt::skip_stmt() {}
+template<typename T>
+skip_stmt<T>::skip_stmt() {}
 
 void skip_stmt::evaluate() {}
 void skip_stmt::print(int n)
@@ -428,7 +452,8 @@ void skip_stmt::print(int n)
 	output_tabs(n);
 }
 
-sequence_stmt::sequence_stmt(statement *mystmt1, statement *mystmt2) : stmt1(mystmt1), stmt2(mystmt2)
+template<typename T>
+sequence_stmt<T>::sequence_stmt(statement *mystmt1, statement *mystmt2) : stmt1(mystmt1), stmt2(mystmt2)
 {
 }
 
@@ -445,7 +470,8 @@ void sequence_stmt::evaluate()
 	stmt2->evaluate();
 }
 
-expression_stmt::expression_stmt(exp_node *myexp) : exp(myexp) {}
+template<typename T>
+expression_stmt<T>::expression_stmt(exp_node<T> *myexp) : exp(myexp) {}
 
 void expression_stmt::print() {}
 
@@ -465,7 +491,8 @@ void test::print()
 	condition->print();
 }
 
-test::test(cond_node *condition)
+template<typename T>
+test<T>::test(cond_node<T> *condition)
 {
 	this->condition = condition;
 }

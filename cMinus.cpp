@@ -439,3 +439,4 @@ test::test(cond_node *condition)
 {
 	this->condition = condition;
 }
+

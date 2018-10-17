@@ -24,7 +24,7 @@ class statement
     virtual void evaluate() = 0;
 };
 
-class exp_node : public statement
+class exp_node
 {
   public:
     // print function for pretty printing an expression

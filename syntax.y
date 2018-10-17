@@ -70,7 +70,7 @@ int line_num = 1;
 %type <exp_node_ptr> function_call_arg_list
 %type <exp_node_ptr> function_call_args
 %type <exp_node_ptr> factor
-%type <exp_node_ptr> global_variable_list
+// %type <exp_node_ptr> global_variable_list
 %type <exp_node_ptr> parameters
 %type <exp_node_ptr> parameter_list
 %type <exp_node_ptr> arg
@@ -80,7 +80,7 @@ int line_num = 1;
 %type <st> block
 %type <st> program
 %type <st> global_variable
-
+%type <st> expression_stmt
 %type <st> assign_stmt
 %type <st> return_statement
 %type <st> function_list
@@ -123,7 +123,7 @@ block:
 
 parameters:
     parameter_list {$$ = $1;}
-    | { $$ = new skip_stmt(); }
+    | { $$ = new skip_exp(); }
     ;
 
 parameter_list:
@@ -142,7 +142,7 @@ function_call:
 /* Used to allow for empty function arg on functions without arguments*/
 function_call_args:
     function_call_arg_list { $$ = $1; }
-    | { $$ = new skip_stmt(); }
+    | { $$ = new skip_exp(); }
     ;
 
 function_call_arg_list:
@@ -151,12 +151,7 @@ function_call_arg_list:
     ;
 
 global_variable:
-    var_type ID global_variable_list SEMI { $$ = new var_node($1, $2, $3); }
-    ;
-
-global_variable_list: 
-    global_variable_list COMMA ID { $$ = new var_node ($3,$1); }
-    | { $$ = new skip_stmt(); }         
+    var_type ID SEMI { $$ = new var_node($1, $2); }
     ;
 
 array: 
@@ -174,7 +169,7 @@ var_type:
 statement:
     assign_stmt { $$ = $1; }
     // | PRINT expression { $$ = new print_stmt($2); }
-    | function_call SEMI { $$ = $1; } 
+    | expression_stmt { $$ = $1; }
     | conditional_statement { $$ = $1; }
     | return_statement { $$ = $1; };
     ;
@@ -203,8 +198,14 @@ return_statement:
     RETURN factor SEMI {$$ = new return_stmt($2);}
     ;
     
+expression_stmt:
+    expression { $$ = new expression_stmt($1); }
+    ;
+
 expression:
     logical_or_expr {$$ = $1;}
+    | function_call SEMI { $$ = $1; }
+    | array { $$ = $1; }
     ;
 
 logical_or_expr:
@@ -232,10 +233,7 @@ relational_expr:
     ;
 
 assign_stmt:
-    global_variable { $$ = $1; }
-    | array { $$ = $1; }
-    | var_type ID EQUALS factor SEMI { $$ = new assignment_stmt ($1,$2,$4); }
-    | expression SEMI { $$ = $1; }
+    var_type ID EQUALS factor SEMI { $$ = new assignment_stmt ($1,$2,$4); }
     | ID EQUALS expression SEMI  { $$ = new assignment_stmt ($1,$3); }       
     ;
 

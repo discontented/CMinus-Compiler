@@ -39,6 +39,15 @@ string exp_node::returnvariable_type(int t)
   }
 }
 
+expression_stmt::expression_stmt(exp_node *myexp) : exp(myexp) {}
+
+void expression_stmt::print() {}
+
+void expression_stmt::evaluate()
+{
+    exp->evaluate();
+}
+
 //function_definition
 function_definition::function_definition(int var_type, string id, exp_node *arg, statement *st)
     : var_type(var_type), id(id), arg(arg), st(st) {}
@@ -83,17 +92,14 @@ operator_node::operator_node(exp_node *L, exp_node *R)
 }
 //**************************************
 //for global variable
-var_node::var_node(int var_type, string id, exp_node *list)
-    : var_type(var_type), id(id), list(list) {}
-var_node::var_node(string id, exp_node *list)
-    : var_type(-1), id(id), list(list) {}
+var_node::var_node(int var_type, string id)
+    : var_type(var_type), id(id) {}
 
 void var_node::print()
 {
   if (var_type != -1)
     cout << returnvariable_type(var_type);
   cout << "  " << id;
-  list->print();
   cout << ";";
   cout << "\n";
 }
@@ -467,6 +473,10 @@ float number_node::evaluate()
 //skip statement
 skip_stmt::skip_stmt() {}
 void skip_stmt::print() {}
+
+//skip expression
+skip_exp::skip_exp() {}
+void skip_exp::print() {}
 
 //return statement
 return_stmt::return_stmt(exp_node *expr)

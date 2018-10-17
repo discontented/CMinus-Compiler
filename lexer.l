@@ -22,17 +22,12 @@ string_literal \"(\\.|[^\\"])*\"
 
 %%
 
-{ws}     ;
+{ws}        ;
 \n			{ line_num++; }
 "if"		{ return IF; }
 "else"      { return ELSE; }
 "while"		{ return WHILE; }
-"int"		{ return INT; }
-"string"    { return STRING; }
-"float"		{ return FLOAT; }
-"char"		{ return CHAR; }
 "boolean"	{ return BOOL; }
-"void"		{ return VOID; }    
 "return"	{ return RETURN; }
 "print"     { return PRINT; }
 "("			{ return LPAR; }
@@ -40,7 +35,7 @@ string_literal \"(\\.|[^\\"])*\"
 "{"			{ return LCURL; }
 "}"			{ return RCURL; }
 "["         { return LBRACK; }
-"]"         {return RBRACK; }
+"]"         { return RBRACK; }
 ";"			{ return SEMI; }
 ","			{ return COMMA; }
 "-"         { return MINUS; }
@@ -51,16 +46,16 @@ string_literal \"(\\.|[^\\"])*\"
 "!"         { return NOT; }
 "&&"        { return AND; }
 "||"        { return OR; }
-"=="                {return DOUBLEQUAL;}
-">"                 {return GREATERTHAN;}
-">="                {return GREATEQUAL;}
-"<"                 {return LESSTHAN;}
-"<="                {return LESSEQUAL;}
-"!="                {return NOTEQUAL;}
+"=="        {return DOUBLEQUAL;}
+">"         {return GREATERTHAN;}
+">="        {return GREATEQUAL;}
+"<"         {return LESSTHAN;}
+"<="        {return LESSEQUAL;}
+"!="        {return NOTEQUAL;}
 
 "void"  {yylval.t=VOID;return VOID;}
 "char"  {yylval.t=CHAR; return CHAR;}
-"char*"   {yylval.t=CHARSTAR;return CHARSTAR;}
+"string"   {yylval.t=STRING;return STRING;}
 "int"   {yylval.t=INT; return INT;}
 "float" {yylval.t=FLOAT;return FLOAT;}
 

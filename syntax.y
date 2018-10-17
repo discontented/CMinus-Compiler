@@ -88,7 +88,9 @@ int line_num = 1;
 
 %%
 
-current_state: program{root = $$}
+current_state:
+    program{root = $$}
+    ;
 
 program:
     function_list { root = $1; }
@@ -101,8 +103,8 @@ function_list:
     ;
 
 function: 
-  var_type ID LPARENT arguments RPARENT block { $$ = new function_definition ($1, $2, $4, $6); } 
-  ;
+    var_type ID LPARENT arguments RPARENT block { $$ = new function_definition ($1, $2, $4, $6); } 
+    ;
 
 block:
 LCURLY statement_list RCURLY { $$ = $2; };

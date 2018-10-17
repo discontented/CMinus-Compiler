@@ -39,8 +39,8 @@ string_literal \"(\\.|[^\\"])*\"
 ")"			{ return RPAR; }
 "{"			{ return LCURL; }
 "}"			{ return RCURL; }
-"["     { return LBRACK; }
-"]"     {return RBRACK; }
+"["         { return LBRACK; }
+"]"         {return RBRACK; }
 ";"			{ return SEMI; }
 ","			{ return COMMA; }
 "-"         { return MINUS; }
@@ -63,8 +63,6 @@ string_literal \"(\\.|[^\\"])*\"
 "char*"   {yylval.t=CHARSTAR;return CHARSTAR;}
 "int"   {yylval.t=INT; return INT;}
 "float" {yylval.t=FLOAT;return FLOAT;}
-
-
 
 {DIGIT}+            { yylval.num = atof(yytext); return NUMBER;	}
 {LETTER}[0-9a-zA-Z]*    { yylval.id = strdup(yytext); return ID; }

@@ -26,14 +26,13 @@ int line_num = 1;
 
 %}
 
-%start program
+%start current_state
 
 %union {
   float num;
   char *id;
   operation oper;
   exp_node *exp_node_ptr;
-  cond_node *cond_node_ptr;
   statement *st;
 }
 
@@ -42,7 +41,7 @@ int line_num = 1;
 /* Bison Declarations */
 %token IF WHILE ELSE
 %token SEMI COMMA LPAR RPAR LCURL RCURL
-%token INT STRING FLOAT CHAR BOOL VOID
+%token INT STRING FLOAT CHAR CHARSTAR BOOL VOID DOUBLEQUAL NOTEQUAL LBRACK RBRACK NULLTOKEN
 %token RETURN
 %token AND OR NOT
 %token EQUALS PLUS MINUS TIMES DIVIDE
@@ -53,17 +52,34 @@ int line_num = 1;
 %type <exp_node_ptr> expression
 %type <exp_node_ptr> multiplicative_expr
 %type <exp_node_ptr> arithmetic_expr
-// %type <exp_node_ptr> function_call
+%type <exp_node_ptr> logical_or_expr
+%type <exp_node_ptr> logical_and_expr
+%type <exp_node_ptr> equality_expr
+%type <exp_node_ptr> relational_expr
+%type <exp_node_ptr> array
+%type <exp_node_ptr> function_call
+%type <exp_node_ptr> function_call_arg_list
+%type <exp_node_ptr> function_call_args
 %type <exp_node_ptr> factor
+%type <exp_node_ptr> global_variable_list
+%type <exp_node_ptr> parameters
+%type <exp_node_ptr> arg
+%type <exp_node_ptr> parameter_list
+%type <st> current_state
 %type <st> statement_list
 %type <st> stmt
+%type <st> block
 %type <st> program
+%type <st> global_variable
 %type <st> expression_stmt
 %type <st> assign_stmt
+%type <st> function_list
+%type <st> function
 // %type <st> declarator
 // %type <st> declarator_list
 %type <st> while_statement
 %type <st> if_statement
+%type <t> variable_type
 // %type <st> return_statement
 %type <cond_node_ptr> boolean_expr
 %type <cond_node_ptr> mul_bexpr
@@ -71,30 +87,142 @@ int line_num = 1;
 
 %%
 
+current_state: program{root = $$}
+
 program:
-    statement_list { root = $$; }
-    ;
-/*
-function:
-    function_declaration
-    | function_declaration block
+    function_list { root = $1; }
     ;
 
-parameter_list:
-    expression
-    | parameter_list COMMA expression
+function_list:
+    function_list function
+            { 
+             $$ = new function_parameter ($1,$2);
+            }
+            | function_list global_variable
+            {
+             $$ = $$ = new function_parameter ($1,$2);
+            }
+            | 
+            {
+             $$ = new skip_stmt();
+            }
     ;
+
+function: 
+       var_type ID LPARENT arguments RPARENT block 
+       {
+        $$ = new function_definition ($1, $2, $4, $6);
+       } 
+  ;
+
+block:
+             LCURLY statement_list RCURLY
+             {
+             $$ = $2;
+             }
+             ;
+
+parameters:
+        parameter_list{$$ = 1;}
+        |
+        {
+            $$ = new skip_stmt();
+        }
+
+parameter_list:
+    arg
+    { $$ = $1; }
+    parameter_list COMMA arg
+    {
+        $$ = new arg_node($1, $3)
+    }
+    ;
+
+arg:
+    var_type ID{
+        $$ = new par_node($1, $2, $3)
+    }
+
+global_variable_list: 
+         global_variable_list COMMA ID  
+         {
+          $$ = new var_node ($3,$1);
+         }
+         |
+         {
+          $$ = new skip_stmt();
+         }         
+  ;
+
+var_type:
+       CHAR
+       | CHARSTAR
+       | INT
+       | FLOAT
+       | VOID
+  ;
+
+array: 
+     var_type ID LBRACK NUMBER RBRACK SEMI
+     {
+      $$ = new arr_var($1,$2,$4);
+      }
+
 
 function_declaration:
     type ID LPAR parameter_list RPAR
     ;
 
 function_call:
-    ID LPAR parameter_list RPAR
+    ID LPAR function_call_args RPAR
+    {
+        $$ = new function_call_stmt($1, $3);
+    }
     ;
-*/
+
+function_call_args:
+    function_call_arg_list
+    {
+        $$ = $1;
+    }
+    |
+    {
+        $$ = new skip_stmt();
+    }
+    ;
 
 statement_list:
+            statement statement_list
+            {
+             $$ = new statement_list($1,$2);
+            }
+            | return_stmt
+         {
+          $$ = $1;
+         }
+            | 
+            {
+             $$ = new skip_stmt();
+            } 
+  ;
+
+
+statement:
+         assignment
+         {
+          $$ = $1;
+         }
+         |call SEMICOLON
+         {
+          $$=$1;
+         } 
+         | conditional_statement
+         {
+          $$ = $1;
+         }
+         ;
+
+/*statement_list:
     statement_list SEMI stmt { $$ = new sequence_stmt($1, $3); }
     | statement_list SEMI error { $$ = $1; yyclearin; }
     | stmt { $$ = $1; }
@@ -147,28 +275,111 @@ while_statement:
     WHILE LPAR boolean_expr RPAR stmt { $$ = new while_stmt(new test($3), $5); }
     ;
 
-/*
-return_statement:
-    //RETURN expression {$$ = returnStatement($2);}
-    | RETURN
-    ;
-*/
 
-expression_stmt: 
-    expression {$$ = new expression_stmt($1); }
+return_statement:
+    RETURN factor SEMI {$$ = new return_stmt($2);}
+    
     ;
+
+
+/*expression_stmt: 
+    expression {$$ = new expression_stmt($1); }
+    ;*/
     
 expression:
-    arithmetic_expr {$$ = $1;}
+    logical_or_expr {$$ = $1;}
     ;
 
+logical_or_expr:
+              logical_and_expr
+              {
+               $$ = $1;
+              }
+                | logical_or_expr OR logical_and_expr 
+              {
+                   $$ = new logical_or ($1,$3);
+              }
+     ;
+
+logical_and_expr:
+               equality_expr
+               {
+                $$ = $1;
+               }
+                 | logical_and_expr AND equality_expr 
+               {
+                  $$ = new logical_and ($1,$3);
+               }
+     ;
+
+equality_expr:
+            relational_expr
+            {
+             $$ = $1;
+            }
+              | equality_expr DOUBLEEQUAL relational_expr 
+            {
+             $$ = new logical_equal($1,$3);
+                }
+              | equality_expr NOTEQUAL relational_expr 
+            {
+             $$ = new logical_notequal($1,$3);
+            }
+    ;
+
+relational_expr:
+              arithmetic_expr
+              {
+               $$ = $1;
+              }
+                | relational_expr LESSTHAN arithmetic_expr 
+              {
+               $$ = new logical_less_than($1,$3);
+                }
+                | relational_expr GREATERTHAN arithmetic_expr 
+              {
+                   $$ = new logical_greater_than($1,$3);
+                }
+              | relational_expr LESSEQUAL arithmetic_expr 
+              {
+                   $$ = new logical_lessequal($1,$3);
+              }
+                | relational_expr GREATEQUAL arithmetic_expr 
+              {
+                   $$ = new logical_greatequal($1,$3);
+                }
+  ;
+
 assign_stmt:
-    ID EQUALS expression {$$ = new assignment_stmt($1, $3);}
+    global_variable
+           {
+           $$ = $1;
+           }
+           |
+           array
+           {
+           $$ = $1;
+            }
+           |
+           var_type ID EQUAL factor SEMI
+           {
+               $$ = new assignment_stmt ($1,$2,$4);          
+               }
+           | 
+           expression SEM
+           {
+            $$ = $1;
+           }
+           | 
+           ID EQUAL expression SEM
+           {
+           $$ = new assignment_stmt ($1,$3);
+           }       
     ;
 
 arithmetic_expr:
-    arithmetic_expr PLUS multiplicative_expr { $$ = new plus_node($1, $3); }
-    | arithmetic_expr MINUS multiplicative_expr { $$ = new minus_node($1, $3); }
+    arithmetic_expr PLUS multiplicative_expr { $$ = new plus_expression($1, $3); }
+    | arithmetic_expr MINUS multiplicative_expr { $$ = new minus_expression($1, $3); }
     | multiplicative_expr { $$ = $1; }
     ;
 
@@ -183,6 +394,10 @@ factor:
     | MINUS factor  {$$ = new unary_minus_node($2); }
     | NUMBER {$$ = new number_node($1); }
     | ID  {$$ = new id_node($1); }
+    | ID LSQUBRACKT NUMBER RSQUBRACKT
+            {
+             $$ = new arr_var($1,$3);
+            }
     ;
 
 boolean_expr:

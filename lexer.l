@@ -39,6 +39,8 @@ string_literal \"(\\.|[^\\"])*\"
 ")"			{ return RPAR; }
 "{"			{ return LCURL; }
 "}"			{ return RCURL; }
+"["     { return LBRACK; }
+"]"     {return RBRACK; }
 ";"			{ return SEMI; }
 ","			{ return COMMA; }
 "-"         { return MINUS; }
@@ -49,15 +51,23 @@ string_literal \"(\\.|[^\\"])*\"
 "!"         { return NOT; }
 "&&"        { return AND; }
 "||"        { return OR; }
-"=="                {yylval.oper = EQ; return RELOP;}
-">"                 {yylval.oper = GT; return RELOP;}
-">="                {yylval.oper = GE; return RELOP;}
-"<"                 {yylval.oper = LT; return RELOP;}
-"<="                {yylval.oper = LE; return RELOP;}
-"!="                {yylval.oper = NO; return RELOP;}
+"=="                {return DOUBLEQUAL;}
+">"                 {return GREATERTHAN;}
+">="                {return GREATEQUAL;}
+"<"                 {return LESSTHAN;}
+"<="                {return LESSEQUAL;}
+"!="                {return NOTEQUAL;}
+
+"void"  {yylval.t=VOID;return VOID;}
+"char"  {yylval.t=CHAR; return CHAR;}
+"char*"   {yylval.t=CHARSTAR;return CHARSTAR;}
+"int"   {yylval.t=INT; return INT;}
+"float" {yylval.t=FLOAT;return FLOAT;}
+
+
+
 {DIGIT}+            { yylval.num = atof(yytext); return NUMBER;	}
 {LETTER}[0-9a-zA-Z]*    { yylval.id = strdup(yytext); return ID; }
-{string_literal}	{ str_val = strdup(yytext); return STRING; }
 
 
 . { BEGIN(ERROR); yymore(); }

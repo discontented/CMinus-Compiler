@@ -16,8 +16,14 @@ enum operation
 	NO
 };
 
-class exp_node
-{
+class statement {
+ public:
+  virtual void print()=0 ;
+  char* return_type (int t );
+  //virtual void evaluate() = 0;
+};
+
+class exp_node: public statement {
 public:
 	// print function for pretty printing an expression
 	virtual void print() = 0;
@@ -35,6 +41,37 @@ public:
 	// the constructor for node links the node to its children,
 	// and stores the character representation of the operator.
 	operator_node(exp_node *L, exp_node *R);
+};
+
+class arr_var : public exp_node {
+protected:
+int var_type;
+string id;
+float value;
+public:
+arr_var( string id, float value);
+arr_var(int var_type, string id, float value);
+void print();
+};
+
+class assignment_stmt: public statement{
+protected:
+int var_type;
+string id;
+exp_node *expr;
+public:
+assignment_stmt (string id, exp_node *expr);
+assignment_stmt (int var_type,string id, exp_node *expr);
+void print();
+};
+
+class statement_list: public statement{
+ protected:
+ statement *st1;
+ statement *st2;
+public:
+statement_list ( statement *st1,statement *st2 );
+void print();
 };
 
 class number_node : public exp_node

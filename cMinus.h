@@ -21,7 +21,7 @@ class statement
   public:
     virtual void print() = 0;
     char *return_type(int t);
-    //virtual void evaluate() = 0;
+    virtual void evaluate() = 0;
 };
 
 class exp_node : public statement

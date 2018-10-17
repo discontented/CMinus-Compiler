@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "cMinus.h"
+#include "myc.h"
 #include "y.tab.h"
 
     int num_val;
@@ -53,13 +53,13 @@ string_literal \"(\\.|[^\\"])*\"
 "<="        {return LESSEQUAL;}
 "!="        {return NOTEQUAL;}
 
-"void"  {yylval.t=VOID;return VOID;}
-"char"  {yylval.t=CHAR; return CHAR;}
-"string"   {yylval.t=STRING;return STRING;}
-"int"   {yylval.t=INT; return INT;}
-"float" {yylval.t=FLOAT;return FLOAT;}
+"void"      {yylval.t=VOID;return VOID;}
+"char"      {yylval.t=CHAR; return CHAR;}
+"string"    {yylval.t=STRING;return STRING;}
+"int"       {yylval.t=INT; return INT;}
+"float"     {yylval.t=FLOAT;return FLOAT;}
 
-{DIGIT}+            { yylval.num = atof(yytext); return NUMBER;	}
+{DIGIT}+                { yylval.num = atof(yytext); return NUMBER;	}
 {LETTER}[0-9a-zA-Z]*    { yylval.id = strdup(yytext); return ID; }
 
 

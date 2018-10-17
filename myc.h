@@ -6,22 +6,30 @@
 
 using namespace std;
 
-class statement
+
+
+template <class T>
+class rootNode {
+  virtual void print() = 0;
+  virtual T evaluate() = 0;
+};
+
+class statement : public rootNode<void>
 {
 public:
   virtual void print() = 0;
-  char *returnvariable_type(int t);
-  //virtual void evaluate() = 0;
+  string returnvariable_type(int t);
+  virtual void evaluate() = 0;
 };
 
-class exp_node : public statement
+class exp_node : public rootNode<float>
 {
 public:
   // print function for pretty printing an expression
   virtual void print() = 0;
-
+  string returnvariable_type(int t);
   // evaluation function for a leaf, replaced for interior nodes
-  //virtual float evaluate() = 0;
+  virtual float evaluate() = 0;
 };
 
 class operator_node : public exp_node
@@ -33,7 +41,7 @@ public:
 };
 
 //**************************************
-class arr1d_var : public exp_node
+class arr_var : public exp_node
 {
 protected:
   int var_type;
@@ -41,22 +49,8 @@ protected:
   float value;
 
 public:
-  arr1d_var(string id, float value);
-  arr1d_var(int var_type, string id, float value);
-  void print();
-};
-
-class arr2d_var : public exp_node
-{
-protected:
-  int var_type;
-  string id;
-  float value1;
-  float value2;
-
-public:
-  arr2d_var(string id, float value1, float value2);
-  arr2d_var(int var_type, string id, float value1, float value2);
+  arr_var(string id, float value);
+  arr_var(int var_type, string id, float value);
   void print();
 };
 
@@ -315,6 +309,7 @@ private:
 public:
   number_node(float value);
   void print();
+  float evaluate();
 };
 //*********************************
 class var_node : public exp_node
@@ -330,12 +325,12 @@ public:
   void print();
 };
 //********************************
-class skip_stmt : public exp_node
+class skip_stmt : public statement
 {
 public:
   skip_stmt();
   void print();
-  //void evaluate();
+  void evaluate();
 };
 
 class arg_node : public exp_node
@@ -370,6 +365,7 @@ public:
 public:
   function_definition(int var_type, string id, exp_node *arg, statement *st);
   void print();
+  string returnvariable_type(int var_type);
 };
 
 class return_stmt : public statement

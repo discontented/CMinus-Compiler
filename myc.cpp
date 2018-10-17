@@ -7,22 +7,38 @@
 #include "y.tab.h"
 
 using namespace std;
-char *statement::returnvariable_type(int t)
+
+string statement::returnvariable_type(int t)
 {
   switch (t)
   {
   case INT:
     return "int";
-  case LONG:
-    return "long";
   case CHAR:
     return "char";
   case VOID:
     return "void";
-  case CHARSTAR:
-    return "char*";
+  case STRING:
+    return "string";
   }
 }
+
+
+string exp_node::returnvariable_type(int t)
+{
+  switch (t)
+  {
+  case INT:
+    return "int";
+  case CHAR:
+    return "char";
+  case VOID:
+    return "void";
+  case STRING:
+    return "string";
+  }
+}
+
 //function_definition
 function_definition::function_definition(int var_type, string id, exp_node *arg, statement *st)
     : var_type(var_type), id(id), arg(arg), st(st) {}
@@ -83,34 +99,17 @@ void var_node::print()
 }
 
 //for 1D array
-arr1d_var::arr1d_var(int var_type, string id, float value)
+arr_var::arr_var(int var_type, string id, float value)
     : var_type(var_type), id(id), value(value) {}
-arr1d_var::arr1d_var(string id, float value)
+arr_var::arr_var(string id, float value)
     : var_type(-1), id(id), value(value) {}
-void arr1d_var::print()
+void arr_var::print()
 {
   if (var_type != -1)
     cout << returnvariable_type(var_type);
   //cout << "1D Array :";
   //cout << "\n";
   cout << "  " << id << "[" << value << "]"
-       << ";"
-       << "\n";
-}
-
-//for 2D array
-arr2d_var::arr2d_var(int var_type, string id, float value1, float value2)
-    : var_type(var_type), id(id), value1(value1), value2(value2) {}
-arr2d_var::arr2d_var(string id, float value1, float value2)
-    : var_type(-1), id(id), value1(value1), value2(value2) {}
-void arr2d_var::print()
-{
-  if (var_type != -1)
-    cout << returnvariable_type(var_type);
-  //cout << "2D Array :";
-  //cout << "\n";
-  cout << "  " << id << "[" << value1 << "]"
-       << "[" << value2 << "]"
        << ";"
        << "\n";
 }
@@ -458,6 +457,11 @@ void number_node::print()
 {
   //cout << "\n";
   cout << num;
+}
+
+float number_node::evaluate()
+{
+    return num;
 }
 
 //skip statement

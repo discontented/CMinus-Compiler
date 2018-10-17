@@ -11,7 +11,7 @@ void yyerror(const char * s);
 #include <stdio.h>
 #include <map>
 #include <list>
-#include "cMinus.h"
+#include "myc.h"
 #include "y.tab.h"
 #define YYDEBUG 1
 
@@ -32,7 +32,6 @@ int line_num = 1;
 %union {
   float num;
   char *id;
-  operation oper;
   exp_node *exp_node_ptr;
   statement *st;
   int t;
@@ -59,7 +58,6 @@ int line_num = 1;
 
 %token <num> NUMBER
 %token <id> ID
-%token <oper> RELOP
 %type <exp_node_ptr> expression
 %type <exp_node_ptr> multiplicative_expr
 %type <exp_node_ptr> arithmetic_expr
@@ -95,14 +93,14 @@ int line_num = 1;
 
 %type <t> var_type
 // %type <st> return_statement
-%type <cond_node_ptr> boolean_expr
-%type <cond_node_ptr> mul_bexpr
-%type <cond_node_ptr> root_bexpr
+// %type <cond_node_ptr> boolean_expr
+// %type <cond_node_ptr> mul_bexpr
+// %type <cond_node_ptr> root_bexpr
 
 %%
 
 current_state:
-    program {root = $$}
+    program {root = $$; }
     ;
 
 program:
@@ -111,7 +109,7 @@ program:
 
 function_list:
     function_list function { $$ = new function_parameter ($1,$2); }
-    | function_list global_variable { $$ = $$ = new function_parameter ($1,$2); }
+    | function_list global_variable { $$ = new function_parameter ($1,$2); }
     | { $$ = new skip_stmt(); }
     ;
 
@@ -148,7 +146,7 @@ function_call_args:
     ;
 
 function_call_arg_list:
-    expression { $$ = $1 }
+    expression { $$ = $1; }
     | function_call_arg_list COMMA expression { $$ = new call_list($1, $3); }
     ;
 
@@ -161,6 +159,10 @@ global_variable_list:
     | { $$ = new skip_stmt(); }         
     ;
 
+array: 
+    var_type ID LBRACK NUMBER RBRACK SEMI { $$ = new arr_var($1,$2,$4); }
+    ;
+
 var_type:
     CHAR 
     | STRING
@@ -169,16 +171,12 @@ var_type:
     | VOID 
     ;
 
-array: 
-    var_type ID LBRACK NUMBER RBRACK SEMI { $$ = new arr_var($1,$2,$4); }
-    ;
-
 statement:
-    PRINT expression { $$ = new print_stmt($2); }
-    | assign_stmt { $$ = $1; }
+    assign_stmt { $$ = $1; }
+    // | PRINT expression { $$ = new print_stmt($2); }
     | function_call SEMI { $$ = $1; } 
     | conditional_statement { $$ = $1; }
-    | return_statement { $$ = $1 };
+    | return_statement { $$ = $1; };
     ;
 
 statement_list:
@@ -193,11 +191,12 @@ conditional_statement:
     ;
 
 if_statement:
-	IF LPAR boolean_expr RPAR statement ELSE statement { $$ = new ife_stmt(new test($3), $5, $7); }
+	IF LPAR expression RPAR block { $$ = new if_then_stmt($3, $5); }
+    | IF LPAR expression RPAR block ELSE block { $$ = new if_then_else_stmt($3, $5, $7); }
     ;
 
 while_statement:
-    WHILE LPAR boolean_expr RPAR statement { $$ = new while_stmt(new test($3), $5); }
+    WHILE LPAR expression RPAR block { $$ = new while_stmt($3, $5); }
     ;
 
 return_statement:
@@ -210,24 +209,24 @@ expression:
 
 logical_or_expr:
     logical_and_expr { $$ = $1; }
-    | logical_or_expr OR logical_and_expr { $$ = new logical_or ($1,$3); }
+    | logical_or_expr OR logical_and_expr { $$ = new logical_oror($1,$3); }
     ;
 
 logical_and_expr:
     equality_expr { $$ = $1; }
-    | logical_and_expr AND equality_expr { $$ = new logical_and ($1,$3); }
+    | logical_and_expr AND equality_expr { $$ = new logical_andand($1,$3); }
     ;
 
 equality_expr:
     relational_expr { $$ = $1; }
-    | equality_expr DOUBLEQUAL relational_expr { $$ = new logical_equal($1,$3); }
+    | equality_expr DOUBLEQUAL relational_expr { $$ = new logical_equalequal($1,$3); }
     | equality_expr NOTEQUAL relational_expr { $$ = new logical_notequal($1,$3); }
     ;
 
 relational_expr:
     arithmetic_expr { $$ = $1; }
-    | relational_expr LESSTHAN arithmetic_expr { $$ = new logical_less_than($1,$3); }
-    | relational_expr GREATERTHAN arithmetic_expr { $$ = new logical_greater_than($1,$3); }
+    | relational_expr LESSTHAN arithmetic_expr { $$ = new logical_less($1,$3); }
+    | relational_expr GREATERTHAN arithmetic_expr { $$ = new logical_great($1,$3); }
     | relational_expr LESSEQUAL arithmetic_expr { $$ = new logical_lessequal($1,$3); }
     | relational_expr GREATEQUAL arithmetic_expr { $$ = new logical_greatequal($1,$3); }
     ;
@@ -247,19 +246,19 @@ arithmetic_expr:
     ;
 
 multiplicative_expr:
-    multiplicative_expr TIMES factor { $$ = new times_node( $1, $3); }
-    | multiplicative_expr DIVIDE factor { $$ = new divide_node( $1, $3); }
+    multiplicative_expr TIMES factor { $$ = new times_expression( $1, $3); }
+    | multiplicative_expr DIVIDE factor { $$ = new divide_expression( $1, $3); }
     | factor { $$ = $1; }                    
     ;
 
 factor:
     LPAR expression RPAR {$$ = $2; }
-    | MINUS factor  {$$ = new unary_minus_node($2); }
+    // | MINUS factor  {$$ = new unary_minus_node($2); }
     | NUMBER {$$ = new number_node($1); }
     | ID  {$$ = new id_node($1); }
     | ID LBRACK NUMBER RBRACK { $$ = new arr_var($1,$3); }
     ;
-
+/*
 boolean_expr:
     boolean_expr OR mul_bexpr { $$ = new or_cond_node($1, $3); }
     | mul_bexpr { $$ = $1; }
@@ -275,7 +274,7 @@ root_bexpr:
     | LPAR boolean_expr RPAR { $$ = $2; }
     | arithmetic_expr RELOP arithmetic_expr { $$ = new prim_cond_node($2, $1, $3); }
     ;
-
+*/
 %%
 int main(int argc, char **argv)
 { 
@@ -286,7 +285,7 @@ int main(int argc, char **argv)
 
   cout << "---------- list of input program------------" << endl << endl;
 
-  root -> print(0); cout<< endl;
+  root -> print(); cout<< endl;
 
   cout << "---------- exeuction of input program------------" << endl << endl;
 

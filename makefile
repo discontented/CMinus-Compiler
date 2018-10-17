@@ -6,7 +6,7 @@ YACC= bison
 YFLAGS= -d -t -y
 F_BISON = syntax
 F_LEX = lexer
-F_CPP = cMinus
+F_CPP = myc
 
 RM = /bin/rm -f
 

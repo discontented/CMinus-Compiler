@@ -65,7 +65,7 @@ int line_num = 1;
 %type <exp_node_ptr> logical_and_expr
 %type <exp_node_ptr> equality_expr
 %type <exp_node_ptr> relational_expr
-%type <exp_node_ptr> array
+// %type <exp_node_ptr> array
 %type <exp_node_ptr> function_call
 %type <exp_node_ptr> function_call_arg_list
 %type <exp_node_ptr> function_call_args
@@ -82,7 +82,7 @@ int line_num = 1;
 %type <st> global_variable
 %type <st> expression_stmt
 %type <st> assign_stmt
-%type <st> return_statement
+%type <exp_node_ptr> return_statement
 %type <st> function_list
 %type <st> function
 // %type <st> declarator
@@ -154,9 +154,11 @@ global_variable:
     var_type ID SEMI { $$ = new var_node($1, $2); }
     ;
 
+/*
 array: 
     var_type ID LBRACK NUMBER RBRACK SEMI { $$ = new arr_var($1,$2,$4); }
     ;
+*/
 
 var_type:
     CHAR 
@@ -168,10 +170,9 @@ var_type:
 
 statement:
     assign_stmt { $$ = $1; }
-    // | PRINT expression { $$ = new print_stmt($2); }
+    | PRINT expression { $$ = new print_stmt($2); }
     | expression_stmt { $$ = $1; }
     | conditional_statement { $$ = $1; }
-    | return_statement { $$ = $1; };
     ;
 
 statement_list:
@@ -205,7 +206,8 @@ expression_stmt:
 expression:
     logical_or_expr {$$ = $1;}
     | function_call SEMI { $$ = $1; }
-    | array { $$ = $1; }
+    // | array { $$ = $1; }
+    | return_statement { $$ = $1; };
     ;
 
 logical_or_expr:
@@ -254,8 +256,9 @@ factor:
     // | MINUS factor  {$$ = new unary_minus_node($2); }
     | NUMBER {$$ = new number_node($1); }
     | ID  {$$ = new id_node($1); }
-    | ID LBRACK NUMBER RBRACK { $$ = new arr_var($1,$3); }
+    // | ID LBRACK NUMBER RBRACK { $$ = new arr_var($1,$3); }
     ;
+
 /*
 boolean_expr:
     boolean_expr OR mul_bexpr { $$ = new or_cond_node($1, $3); }

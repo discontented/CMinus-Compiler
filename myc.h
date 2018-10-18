@@ -7,7 +7,8 @@
 using namespace std;
 
 template <class T>
-class rootNode {
+class rootNode
+{
   virtual void print() = 0;
   virtual T evaluate() = 0;
 };
@@ -30,42 +31,43 @@ public:
   virtual float evaluate() = 0;
 };
 
-class expression_stmt : public statement
-{
-  protected:
-    exp_node *exp;
-
-  public:
-    expression_stmt(exp_node *myexp);
-    void print();
-    void evaluate();
-};
-
-
-class operator_node : public exp_node
+class funcStruct
 {
 public:
-  exp_node *left;
-  exp_node *right;
-  operator_node(exp_node *L, exp_node *R);
-  float evaluate();
+  int var_type;
+  string id;
+  exp_node *arg;
+  statement *st;
+  funcStruct(int var_type, string id, exp_node *arg, statement *st);
+};
+
+class expression_stmt : public statement
+{
+protected:
+  exp_node *exp;
+
+public:
+  expression_stmt(exp_node *myexp);
+  void print();
+  void evaluate();
 };
 
 //**************************************
+/*
 class arr_var : public exp_node
 {
 protected:
   int var_type;
   string id;
-  float value;
+  int value;
 
 public:
   arr_var(string id, float value);
-  arr_var(int var_type, string id, float value);
+  arr_var(int var_type, string id, int value);
   void print();
   float evaluate();
 };
-
+*/
 class assignment_stmt : public statement
 {
 protected:
@@ -412,7 +414,7 @@ public:
   void evaluate();
 };
 
-class return_stmt : public statement
+class return_stmt : public exp_node
 {
 public:
   exp_node *expr;
@@ -420,7 +422,7 @@ public:
 public:
   return_stmt(exp_node *expr);
   void print();
-  void evaluate();
+  float evaluate();
 };
 
 class call_list : public exp_node
@@ -447,4 +449,17 @@ public:
   float evaluate();
 };
 
+class print_stmt : public statement
+{
+protected:
+  exp_node *exp;
+
+public:
+  print_stmt(exp_node *myexp);
+  void print();
+  void evaluate();
+};
+
 extern map<string, float> idTable;
+extern map<string, float*> arrayTable;
+extern map<string, funcStruct*> funcTable;

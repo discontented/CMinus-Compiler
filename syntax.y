@@ -37,7 +37,7 @@ int line_num = 1;
   int t;
 }
 
-// %error-verbose
+%error-verbose
 
 /* Bison Declarations */
 // Structurs
@@ -55,6 +55,7 @@ int line_num = 1;
 // Special functions
 %token RETURN
 %token PRINT
+%nonassoc ELSE
 
 %token <num> NUMBER
 %token <id> ID
@@ -173,6 +174,7 @@ statement:
     | PRINT expression { $$ = new print_stmt($2); }
     | expression_stmt { $$ = $1; }
     | conditional_statement { $$ = $1; }
+    | { $$ = new skip_stmt(); }
     ;
 
 statement_list:

@@ -106,7 +106,7 @@ var_node::var_node(int var_type, string id)
 void var_node::print()
 {
   if (var_type != -1)
-    cout << returnvariable_type(var_type);
+  cout << returnvariable_type(var_type);
   cout << "  " << id;
   cout << ";";
   cout << "\n";

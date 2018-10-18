@@ -1,2 +1,3 @@
-x = 2;
-print x;
+float main() {
+    x = 2;
+}

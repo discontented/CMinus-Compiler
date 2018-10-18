@@ -461,5 +461,5 @@ public:
 };
 
 extern map<string, float> idTable;
-extern map<string, float*> arrayTable;
-extern map<string, funcStruct*> funcTable;
+extern map<string, float *> arrayTable;
+extern map<string, funcStruct *> funcTable;
